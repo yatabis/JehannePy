@@ -11,6 +11,8 @@ url_reply = "https://api.line.me/v2/bot/message/reply"
 
 @route("/callback", method='POST')
 def callback():
+    print(request.body)
+    """
     events = json.loads(request.body.decode("utf-8"))['events']
     for event in events:
         if event['type'] == "message":
@@ -21,6 +23,7 @@ def callback():
                 body = json.dumps({'replyToken': reply_token,
                                    'messages': [{'type': 'text', 'text': "リクエストがPOSTされました。"}]})
                 req = requests.post(url_reply, data=body, headers=headers)
+    """
     return f"Hi, this is Jehanne.\n{req}"
 
 

@@ -11,7 +11,7 @@ url_reply = "https://api.line.me/v2/bot/message/reply"
 
 @route("/callback", method='POST')
 def callback():
-    events = json.loads(request.forms.body)
+    events = json.loads(request.body)
     for event in events['events']:
         if event['type'] == "message":
             reply_token = event['replyToken']

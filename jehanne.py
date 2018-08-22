@@ -11,9 +11,9 @@ url_reply = "https://api.line.me/v2/bot/message/reply"
 
 @route("/callback", method='POST')
 def callback():
-    print(request.body().read().decode("utf-8"))
+    events = request.json
+    print(events)
     """
-    events = json.loads(request.body.decode("utf-8"))['events']
     for event in events:
         if event['type'] == "message":
             reply_token = event['replyToken']

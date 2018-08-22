@@ -14,9 +14,10 @@ def callback():
     # body = json.dumps({'to': MASTER,
     #                    'messages': [{'type': 'text', 'text': "リクエストがPOSTされました。"}]})
     # req = requests.post(url_reply, data=body, headers=headers)
-    result = 200
+    event = request.forms.get('events')
     # "request success" if req.status_code == 200 else f"Error: {req.status_code}\nDetail: {req.content}"
-    return f"Hi, this is Jehanne.\n{result}"
+    print(event)
+    return f"Hi, this is Jehanne.\n{event}"
 
 
 run(host="0.0.0.0", port=int(os.environ.get("PORT", 443)))

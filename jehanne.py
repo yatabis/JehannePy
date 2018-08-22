@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 from bottle import route, run, request
@@ -14,10 +15,10 @@ def callback():
     # body = json.dumps({'to': MASTER,
     #                    'messages': [{'type': 'text', 'text': "リクエストがPOSTされました。"}]})
     # req = requests.post(url_reply, data=body, headers=headers)
-    event = request.forms.get('events')
-    # "request success" if req.status_code == 200 else f"Error: {req.status_code}\nDetail: {req.content}"
-    print(event)
-    return f"Hi, this is Jehanne.\n{event}"
+    events = json.loads(request.forms.body)
+    for event in events['events']:
+        print(event)
+    return f"Hi, this is Jehanne.\n{events}"
 
 
 run(host="0.0.0.0", port=int(os.environ.get("PORT", 443)))

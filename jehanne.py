@@ -27,12 +27,10 @@ def callback():
 def reply_text(token, message):
     print(message)
     header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
-    text = f"メッセージを受け取りました。\nid: {message['id']}\ntext: {message['text']}"
+    text = ["メッセージを受け取りました。", f"id: {message['id']}", f"text: {message['text']}"]
     print(text)
     body = {'replyToken': token,
-            'message': [
-                {'type': 'text', 'text': text}
-            ]}
+            'message': [{'type': 'text', 'text': text[i]} for i in range(3)]}
     req = requests.post(url_reply, data=json.dumps(body), headers=header)
     print(req.text)
     return req.status_code

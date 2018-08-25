@@ -19,12 +19,16 @@ def callback():
         mes_type = event['message']['type']
         if mes_type == "text":
             res = reply_text(reply_token, event['message'])
+        else:
+            res = "No response."
     return f"Hi, this is Jehanne.\nresponse: {res}"
 
 
 def reply_text(token, message):
+    print(message)
     headers = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
     text = f"メッセージを受け取りました。\nid: {message['id']}\ntext: {message['text']}"
+    print(text)
     body = {'replyToken': token,
             'message': [
                 {'type': 'text', 'text': text}

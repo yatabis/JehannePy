@@ -26,14 +26,15 @@ def callback():
 
 def reply_text(token, message):
     print(message)
-    headers = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
+    header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
     text = f"メッセージを受け取りました。\nid: {message['id']}\ntext: {message['text']}"
     print(text)
     body = {'replyToken': token,
             'message': [
                 {'type': 'text', 'text': text}
             ]}
-    req = requests.post(url_reply, data=json.dumps(body), headers=headers)
+    req = requests.post(url_reply, data=json.dumps(body), headers=header)
+    print(req)
     return req.status_code
 
 

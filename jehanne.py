@@ -34,7 +34,7 @@ def reply_text(token, message):
                 {'type': 'text', 'text': text}
             ]}
     req = requests.post(url_reply, data=json.dumps(body), headers=header)
-    print(json.loads(req.body)['details'])
+    print(req.text)
     return req.status_code
 
 

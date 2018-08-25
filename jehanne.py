@@ -13,15 +13,36 @@ url_reply = "https://api.line.me/v2/bot/message/reply"
 def callback():
     events = request.json['events']
     for event in events:
-        if event['type'] == "message":
-            reply_token = event['replyToken']
-            mes_type = event['message']['type']
-            if mes_type == "text":
-                headers = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
-                body = json.dumps({'replyToken': reply_token,
-                                   'messages': [{'type': 'text', 'text': "リクエストがPOSTされました。"}]})
-                req = requests.post(url_reply, data=body, headers=headers)
-    return f"Hi, this is Jehanne."
+        if not event['type'] == "message":
+            break
+        reply_token = event['replyToken']
+        mes_type = event['message']['type']
+        if mes_type == "text":
+            res = reply_text(reply_token, event['message'])
+    return f"Hi, this is Jehanne.\nresponse: {res}"
+
+
+def reply_text(token, message):
+    headers = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
+    text = f"メッセージを受け取りました。\nid: {message['id']}\ntext: {message['text']}"
+    body = {'replyToken': token,
+            'message': [
+                {'type': 'text', 'text': text}
+            ]}
+    req = requests.post(url_reply, data=json.dumps(body), headers=headers)
+    return req.status_code
+
+
+def reply_sticker():
+    pass
+
+
+def reply_image():
+    pass
+
+
+def reply_video():
+    pass
 
 
 run(host="0.0.0.0", port=int(os.environ.get("PORT", 443)))

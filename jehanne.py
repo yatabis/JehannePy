@@ -29,8 +29,8 @@ def reply_text(token, message):
     header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
     text = f"メッセージを受け取りました。\nid: {message['id']}\ntext: {message['text']}"
     print(text)
-    body = {'replyToken': "token",
-            'message': [
+    body = {'replyToken': token,
+            'messages': [
                 {'type': 'text', 'text': text}
             ]}
     req = requests.post(url_reply, data=json.dumps(body), headers=header)

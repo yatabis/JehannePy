@@ -18,6 +18,7 @@ def callback():
         if not event['type'] == "message":
             break
         message = LineMessage(event)
+        print(message.message)
         if not message.room == "user" or not message.sender == MASTER:
             return f"Hi, this is Jehanne.\nauthorization failed."
         if message.type == "text":

@@ -23,7 +23,6 @@ class LineMessage:
         self.sender = event['source']['userId']
         self.type = event['message']['type']
         self.token = event['replyToken']
-        self.message = event['message']['text'] if self.type == "text" else None
         self.message = self.get_message(event['message'])
         self.body = []
 

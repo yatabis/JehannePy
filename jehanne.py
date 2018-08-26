@@ -22,17 +22,17 @@ def callback():
             return f"Hi, this is Jehanne.\nauthorization failed."
         if message.type == "text":
             text = create_text(message.message)
-            res = message.reply_text(text)
+            message.reply_text(text)
         elif message.type == "image":
-            res = message.reply_text("画像を受け取りました。")
+            message.reply_text("画像を受け取りました。")
         elif message.type == "video":
-            res = message.reply_text("動画を受け取りました。")
+            message.reply_text("動画を受け取りました。")
         elif message.type == "audio":
-            res = message.reply_text("音声を受け取りました。")
+            message.reply_text("音声を受け取りました。")
         elif message.type == "sticker":
-            res = message.reply_text("スタンプを受け取りました。")
-        else:
-            res = "No response."
+            message.reply_text("スタンプを受け取りました。")
+            message.reply_sticker(message.message)
+        res = message.send_reply()
     return f"Hi, this is Jehanne.\nresponse: {res}"
 
 

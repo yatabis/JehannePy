@@ -18,7 +18,7 @@ def callback():
         if not event['type'] == "message":
             break
         message = LineMessage(event)
-        if not message.room == user or not message.sender == MASTER:
+        if not message.room == "user" or not message.sender == MASTER:
             return f"Hi, this is Jehanne.\nauthorization failed."
         if message.type == "text":
             text = f"メッセージを受け取りました。\ntext: {message.message}"

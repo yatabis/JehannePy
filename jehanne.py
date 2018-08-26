@@ -23,8 +23,14 @@ def callback():
         if message.type == "text":
             text = create_text(message.message)
             res = message.reply_text(text)
-        elif mes_type == "image":
-            pass
+        elif message.type == "image":
+            res = message.reply_text("画像を受け取りました。")
+        elif message.type == "video":
+            res = message.reply_text("動画を受け取りました。")
+        elif message.type == "audio":
+            res = message.reply_text("音声を受け取りました。")
+        elif message.type == "sticker":
+            res = message.reply_text("スタンプを受け取りました。")
         else:
             res = "No response."
     return f"Hi, this is Jehanne.\nresponse: {res}"
@@ -35,7 +41,7 @@ def create_text(message):
         reply = "およびですか、マスター。"
     else:
         reply = f"メッセージを受け取りました。\ntext: {message}"
-    return message
+    return reply
 
 
 run(host="0.0.0.0", port=int(os.environ.get("PORT", 443)))

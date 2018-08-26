@@ -12,6 +12,8 @@ class LineMessage:
     """
 
     CAT = os.environ['CHANNEL_ACCESS_TOKEN']
+    url_reply = "https://api.line.me/v2/bot/message/reply"
+    url_push = "https://api.line.me/v2/bot/message/push"
 
     def __init__(self, event):
         """Constructor for LineMessage"""
@@ -29,9 +31,12 @@ class LineMessage:
                 'messages': [
                     {'type': 'text', 'text': t} for t in text
                 ]}
-        req = requests.post(self.url, data=body, headers=header)
+        req = requests.post(self.url_reply, data=body, headers=header)
         print(req.text)
         return req.status_code
+
+    def push_text(self, text, to):
+        pass
 
 
 if __name__ == '__main__':

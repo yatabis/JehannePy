@@ -30,8 +30,8 @@ def callback():
         elif message.type == "audio":
             message.reply_text("音声を受け取りました。")
         elif message.type == "sticker":
-            message.reply_text(f"スタンプを受け取りました。{message.message}")
-            if message.message[0] in range(1, 5):
+            message.reply_text("スタンプを受け取りました。")
+            if int(message.message[0]) in range(1, 5):
                 message.reply_sticker(*message.message)
             else:
                 message.reply_text("こちらから送信できないスタンプです。")

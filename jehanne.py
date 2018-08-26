@@ -18,7 +18,6 @@ def callback():
         if not event['type'] == "message":
             break
         message = LineMessage(event)
-        print(message.message)
         if not message.room == "user" or not message.sender == MASTER:
             return f"Hi, this is Jehanne.\nauthorization failed."
         if message.type == "text":
@@ -32,7 +31,7 @@ def callback():
             message.reply_text("音声を受け取りました。")
         elif message.type == "sticker":
             message.reply_text("スタンプを受け取りました。")
-            message.reply_sticker(message.message)
+            message.reply_sticker(*message.message)
         res = message.send_reply()
     return f"Hi, this is Jehanne.\nresponse: {res}"
 

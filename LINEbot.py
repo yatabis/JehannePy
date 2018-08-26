@@ -49,15 +49,14 @@ class LineMessage:
             if len(self.body) < 5:
                 self.body.append({'type': 'text', 'text': t})
 
-    def reply_sticker(self, pkgId, stkId):
+    def reply_sticker(self, pkg, stk):
         if len(self.body) < 5:
-            self.body.append({'type': 'sticker', 'packageId': pkgId, 'stickerId': stkId})
+            self.body.append({'type': 'sticker', 'packageId': pkg, 'stickerId': stk})
 
     def send_reply(self):
         header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {self.CAT}"}
         data = {'replyToken': self.token, 'messages': self.body}
         req = requests.post(self.url_reply, data=json.dumps(data), headers=header)
-        print(req.text)
         return req.status_code
 
     def push_text(self, text, to):

@@ -25,7 +25,7 @@ class LineMessage:
         if isinstance(text, str):
             text = [text]
         header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {self.CAT}"}
-        body = {'replyToken': token,
+        body = {'replyToken': self.token,
                 'messages': [
                     {'type': 'text', 'text': t} for t in text
                 ]}

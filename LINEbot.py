@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 
@@ -31,7 +32,7 @@ class LineMessage:
                 'messages': [
                     {'type': 'text', 'text': t} for t in text
                 ]}
-        req = requests.post(self.url_reply, data=body, headers=header)
+        req = requests.post(self.url_reply, data=json.dumps(body), headers=header)
         print(req.text)
         return req.status_code
 

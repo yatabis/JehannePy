@@ -21,7 +21,7 @@ def callback():
         if not message.room == "user" or not message.sender == MASTER:
             return f"Hi, this is Jehanne.\nauthorization failed."
         if message.type == "text":
-            text = f"メッセージを受け取りました。\ntext: {message.message}"
+            text = create_text(message.message)
             res = message.reply_text(text)
         elif mes_type == "image":
             pass
@@ -30,20 +30,12 @@ def callback():
     return f"Hi, this is Jehanne.\nresponse: {res}"
 
 
-def reply_sticker():
-    pass
-
-
-def reply_image():
-    pass
-
-
-def reply_video():
-    pass
-
-
-def send_reply(token, body):
-    pass
+def create_text(message):
+    if "ジャンヌ" in message:
+        reply = "およびですか、マスター。"
+    else:
+        reply = f"メッセージを受け取りました。\ntext: {message}"
+    return message
 
 
 run(host="0.0.0.0", port=int(os.environ.get("PORT", 443)))

@@ -3,6 +3,8 @@ import os
 import requests
 from bottle import route, run, request
 
+from LINEbot import LineMessage
+
 
 CAT = os.environ["CHANNEL_ACCESS_TOKEN"]
 MASTER = os.environ["MASTER"]
@@ -15,27 +17,17 @@ def callback():
     for event in events:
         if not event['type'] == "message":
             break
-        reply_token = event['replyToken']
-        mes_type = event['message']['type']
-        if mes_type == "text":
-            res = reply_text(reply_token, event['message'])
+        message = LineMessage(event)
+        if not message.room == user or not message.sender == MASTER:
+            return f"Hi, this is Jehanne.\nauthorization failed."
+        if message.type == "text":
+            text = f"メッセージを受け取りました。\ntext: {message.message}"
+            res = message.reply_text(text)
+        elif mes_type == "image":
+            pass
         else:
             res = "No response."
     return f"Hi, this is Jehanne.\nresponse: {res}"
-
-
-def reply_text(token, message):
-    print(message)
-    header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
-    text = f"メッセージを受け取りました。\nid: {message['id']}\ntext: {message['text']}"
-    print(text)
-    body = {'replyToken': token,
-            'messages': [
-                {'type': 'text', 'text': text}
-            ]}
-    req = requests.post(url_reply, data=json.dumps(body), headers=header)
-    print(req.text)
-    return req.status_code
 
 
 def reply_sticker():
@@ -47,6 +39,10 @@ def reply_image():
 
 
 def reply_video():
+    pass
+
+
+def send_reply(token, body):
     pass
 
 

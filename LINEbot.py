@@ -24,7 +24,7 @@ class LineMessage:
     def reply_text(self, text):
         if isinstance(text, str):
             text = [text]
-        header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
+        header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {self.CAT}"}
         body = {'replyToken': token,
                 'messages': [
                     {'type': 'text', 'text': t} for t in text

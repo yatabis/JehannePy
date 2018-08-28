@@ -32,7 +32,7 @@ class LineMessage:
         elif self.type in ["image", "video", "audio"]:
             url_content = f"https://api.line.me/v2/bot/message/{message['id']}/content"
             header = {'Authorization': f"Bearer {self.CAT}"}
-            return requests.get(url_content, headers=json.dumps(header)).content
+            return requests.get(url_content, headers=header).content
         elif self.type == "file":
             return message['fileName']
         elif self.type == "location":
@@ -65,5 +65,5 @@ class LineMessage:
     def send_reply(self):
         header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {self.CAT}"}
         data = {'replyToken': self.token, 'messages': self.body}
-        req = requests.post(self.url_reply, data=json.dumps(data), headers=json.dumps(header))
+        req = requests.post(self.url_reply, data=json.dumps(data), headers=header)
         return req.status_code

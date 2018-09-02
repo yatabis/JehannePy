@@ -50,7 +50,7 @@ def scrape_twidata(auth, log):
             status_code.append(req.status_code)
 
     result = check == loop
-    log['result'][hour] = 0 if result else 1
+    log['scraping'][hour] = 0 if result else 1
     log['scrape']['result'] = result
     log['scrape']['detail'] = f"ステータスコードは{str(status_code)[1:-1]}です。"
     return tweets
@@ -78,7 +78,7 @@ def upload_data(auth, fd, log):
         f.SetContentFile(file_path)
         f.Upload()
     except httplib2.ServerNotFoundError:
-        log['result'][hour] = 1
+        log['scraping'][hour] = 1
         log['upload']['result'] = False
         log['upload']['detail'] = "サーバーとの接続に失敗しました。"
     except:

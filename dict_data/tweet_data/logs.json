@@ -1,7 +1,16 @@
 {
+  "result": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "scrape": {
+    "result": true,
+    "detail": null
+  },
+  "upload": {
+    "result": true,
+    "detail": null
+  },
   "latest_fetch": {
     "year": 2018,
-    "month": 8,
-    "day": 22
+    "month": 9,
+    "day": 1
   }
 }

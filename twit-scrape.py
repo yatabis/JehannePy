@@ -6,6 +6,7 @@ from requests_oauthlib import OAuth1Session
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import httplib2
+from LINEbot import LineMessage
 
 CK = os.environ["CONSUMER_KEY_J"]
 CS = os.environ["CONSUMER_SECRET_J"]
@@ -26,7 +27,7 @@ file_name = f"{now.strftime('%m_%d__%y')}.txt"
 file_path = f"dict_data/tweet_data/text/{file_name}"
 
 
-def scrape_twidata(auth):
+def scrape_twidata(auth, log):
 
     text = "lang:ja -rt -bot"
     count = 100
@@ -49,7 +50,10 @@ def scrape_twidata(auth):
             status_code.append(req.status_code)
 
     result = check == loop
-    return tweets, {'result': result, 'detail': f"ステータスコードは{str(status_code)[1:-1]}です。"}
+    log['result'][hour] = 0 if result else 1
+    log['scrape']['result'] = result
+    log['scrape']['detail'] = f"ステータスコードは{str(status_code)[1:-1]}です。"
+    return tweets
 
 
 def save_twidata(tweets):
@@ -68,20 +72,27 @@ def get_id(auth):
     return fd
 
 
-def upload_data(auth, fd):
+def upload_data(auth, fd, log):
     try:
         f = auth.CreateFile({'title': f"{now.strftime('%m_%d__%y')}.txt"}) if fd == 0 else auth.CreateFile({'id': fd})
         f.SetContentFile(file_path)
         f.Upload()
     except httplib2.ServerNotFoundError:
-        return {'result': False, 'detail': "サーバーとの接続に失敗しました。"}
+        log['result'][hour] = 1
+        log['upload']['result'] = False
+        log['upload']['detail'] = "サーバーとの接続に失敗しました。"
     except:
-        return {'result': False, 'detail': "予期せぬエラーしました。"}
+        log['scraping'][hour] = 1
+        log['upload']['result'] = False
+        log['upload']['detail'] = "予期せぬエラーが発生しました。"
     else:
-        return {'result': True, 'detail': None}
+        log['scraping'][hour] = 0
+        log['upload']['result'] = True
+        log['upload']['detail'] = None
 
 
 def push_result(log):
+    line = LineMessage()
     noty = f"［定時報告］ 現在時刻{hour}時{minute}分\n"
     if log['scrape']['result']:
         if log['upload']['result']:
@@ -90,10 +101,22 @@ def push_result(log):
             noty += f"ツイート情報の収集に成功しました。\ngoogle Driveへのアップロードに失敗しました。\n{log['upload']['detail']}"
     else:
         noty += f"ツイート情報の収集に失敗しました。\n{log['scrape']['detail']}"
-    headers = {'Content-Type': 'application/json', 'Authorization': f"Bearer {CAT}"}
-    dm = json.dumps({'to': MASTER,
-                     'messages': [{'type': 'text', 'text': noty}]})
-    req = requests.post(url_LINE, data=dm, headers=headers)
+    line.add_text(noty)
+    req = line.push_message()
+    if req.status_code == 200:
+        print("success")
+    else:
+        print(f"Error: {req.status_code}\nDetail: {req.content}")
+
+
+def push_logs(log):
+    if sum(log['result']) == 0:
+        noty = "本日のデータ収集は全て完了しました。"
+    else:
+        noty = "本日のデータ収集は一部失敗しました。"
+    line = LineMessage()
+    line.add_text(noty)
+    req = line.push_message()
     if req.status_code == 200:
         print("success")
     else:
@@ -102,10 +125,12 @@ def push_result(log):
 
 if __name__ == '__main__':
     # Logs
-    logs = {}
+    with open("dict_data/tweet_data/logs.json") as j:
+        logs = json.load(j)
+
     # Twitter
     twitter = OAuth1Session(CK, CS, AT, AS)
-    twidata, logs['scrape'] = scrape_twidata(twitter)
+    twidata = scrape_twidata(twitter, logs)
     save_twidata(twidata)
 
     # Drive
@@ -114,9 +139,13 @@ if __name__ == '__main__':
         gauth.CommandLineAuth(GoogleAuth())
         drive = GoogleDrive(gauth)
         file_id = get_id(drive)
-        logs['upload'] = upload_data(drive, file_id)
+        upload_data(drive, file_id, logs)
     else:
         logs['upload'] = False
 
     # result
     push_result(logs)
+    if hour == 23:
+        push_logs(logs)
+    with open("dict_data/tweet_data/logs.json", 'w') as j:
+        json.dump(logs, j)

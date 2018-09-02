@@ -22,31 +22,31 @@ def callback():
             return f"Hi, this is Jehanne.\nauthorization failed."
         if message.type == "text":
             text = create_text(message.message)
-            message.reply_text(text)
+            message.add_text(text)
         elif message.type == "image":
-            message.reply_text("画像を受け取りました。")
-            message.reply_text("受け取った画像はこちらです：")
-            message.reply_text("message.reply_image")
+            message.add_text("画像を受け取りました。")
+            message.add_text("受け取った画像はこちらです：")
+            message.add_text("message.add_image")
         elif message.type == "video":
-            message.reply_text("動画を受け取りました。")
-            message.reply_text("受け取った動画はこちらです：")
-            message.reply_text("message.reply_video")
+            message.add_text("動画を受け取りました。")
+            message.add_text("受け取った動画はこちらです：")
+            message.add_text("message.add_video")
         elif message.type == "audio":
-            message.reply_text("音声を受け取りました。")
-            message.reply_text("受け取った音声はこちらです：")
-            message.reply_text("message.reply_audio")
+            message.add_text("音声を受け取りました。")
+            message.add_text("受け取った音声はこちらです：")
+            message.add_text("message.add_audio")
         elif message.type == "file":
-            message.reply_text("ファイルを受け取りました。")
-            message.reply_text(f"ファイル名は {message.message} です。")
+            message.add_text("ファイルを受け取りました。")
+            message.add_text(f"ファイル名は {message.message} です。")
         elif message.type == "sticker":
-            message.reply_text("スタンプを受け取りました。")
+            message.add_text("スタンプを受け取りました。")
             if int(message.message[0]) in range(1, 5):
-                message.reply_text("受け取ったスタンプはこちらです：")
-                message.reply_sticker(*message.message)
+                message.add_text("受け取ったスタンプはこちらです：")
+                message.add_sticker(*message.message)
             else:
-                message.reply_text("こちらから送信できないスタンプです。")
-        res = message.send_reply()
-    return f"Hi, this is Jehanne.\nresponse: {res}"
+                message.add_text("こちらから送信できないスタンプです。")
+        res = message.reply_message()
+    return f"Hi, this is Jehanne.\nresponse: {res.content}"
 
 
 def create_text(message):

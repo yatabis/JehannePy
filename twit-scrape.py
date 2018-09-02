@@ -82,11 +82,11 @@ def upload_data(auth, fd, log):
         log['upload']['result'] = False
         log['upload']['detail'] = "サーバーとの接続に失敗しました。"
     except:
-        log['scraping'][hour] = 1
+        log['result'][hour] = 1
         log['upload']['result'] = False
         log['upload']['detail'] = "予期せぬエラーが発生しました。"
     else:
-        log['scraping'][hour] = 0
+        log['result'][hour] = 0
         log['upload']['result'] = True
         log['upload']['detail'] = None
 

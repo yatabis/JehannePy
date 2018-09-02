@@ -12,12 +12,9 @@ CK = os.environ["CONSUMER_KEY_J"]
 CS = os.environ["CONSUMER_SECRET_J"]
 AT = os.environ["ACCESS_TOKEN_J"]
 AS = os.environ["ACCESS_SECRET_J"]
-CAT = os.environ["CHANNEL_ACCESS_TOKEN"]
-MASTER = os.environ["MASTER"]
 
 url_search = "https://api.twitter.com/1.1/search/tweets.json"
 url_DM = "https://api.twitter.com/1.1/direct_messages/new.json"
-url_LINE = "https://api.line.me/v2/bot/message/push"
 
 now = datetime.now()
 hour = now.hour

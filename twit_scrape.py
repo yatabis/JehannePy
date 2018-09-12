@@ -107,10 +107,16 @@ def push_result(log):
 
 
 def push_logs(log):
-    if sum(log['result']) == 0:
+    del log['recent'][0]
+    log['recent'].append(log['today'])
+    if sum(log['today']) == 0:
         noty = "本日のデータ収集は全て完了しました。"
     else:
-        noty = "本日のデータ収集は一部失敗しました。"
+        err = [i for i, t in enumerate(log['today']) if t == 1]
+        noty = "本日のデータ収集は一部失敗しました。\nエラーが発生した時刻は"
+        for e in err:
+            noty += f"、{e}時"
+        noty += "です。"
     line = LineMessage()
     line.add_text(noty)
     req = line.push_message()
@@ -143,6 +149,6 @@ if __name__ == '__main__':
     # result
     push_result(logs)
     if hour == 23:
-        push_logs(logs)
+        push_logs(logs['result'])
     with open("dict_data/tweet_data/logs.json", 'w') as j:
         json.dump(logs, j)

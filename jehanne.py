@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import requests
 from bottle import route, run, request
 
@@ -49,12 +50,32 @@ def callback():
     return f"Hi, this is Jehanne.\nresponse: {res.content}"
 
 
+def push_recent_log(days=0):
+    with open("dict_data/tweet_data/logs.json") as j:
+        logs = json.load(j)
+    res = logs['result']['recent'][:days]
+    return res
+
+
 def create_text(message):
+    # 名前に対する返事
     if "ジャンヌ" in message:
         reply = "およびですか、マスター。"
     else:
         reply = f"メッセージを受け取りました。\ntext: {message}"
+
+    # ログ出力
+    if message.startswith("ログ"):
+        reply = "直近何日間のログを出力しますか？"
+    if "ログ" in message:
+        numbers = re.findall(r'[0-9]+', message)
+        if len(numbers) == 1:
+            days = int(numbers[0])
+            reply = f"直近{days}日間のログを出力します。\n"
+            for l in push_recent_log(days):
+                reply += f"{l}\n"
     return reply
 
 
-run(host="0.0.0.0", port=int(os.environ.get("PORT", 443)))
+if __name__ == '__main__':
+    run(host="0.0.0.0", port=int(os.environ.get("PORT", 443)))

@@ -107,8 +107,8 @@ def push_result(log):
 
 
 def push_logs(log):
-    del log['recent'][0]
-    log['recent'].append(log['today'])
+    del log['recent'][-1]
+    log['recent'].insert(0, log['today'])
     if sum(log['today']) == 0:
         noty = "本日のデータ収集は全て完了しました。"
     else:

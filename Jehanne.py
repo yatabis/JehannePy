@@ -86,10 +86,10 @@ def create_text(message):
             reply = f"ログ出力設定 [hourly] を{log_conf['output']['hourly']}にしました。"
         elif "daily" in message or "デイリー" in message or "毎時" in message:
             log_conf['output']['daily'] = 'オフ' not in message
-            reply = f"ログ出力設定 [hourly] を{log_conf['output']['daily']}にしました。"
+            reply = f"ログ出力設定 [daily] を{log_conf['output']['daily']}にしました。"
         elif "monthly" in message or "マンスリー" in message or "毎月" in message:
             log_conf['output']['monthly'] = 'オフ' not in message
-            reply = f"ログ出力設定 [hourly] を{log_conf['output']['monthly']}にしました。"
+            reply = f"ログ出力設定 [monthly] を{log_conf['output']['monthly']}にしました。"
         else:
             reply = f"現在のログ出力設定は\n" \
                     f"hourly: {log_conf['output']['hourly']}\n" \

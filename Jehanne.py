@@ -64,6 +64,19 @@ def create_text(message):
     else:
         reply = f"メッセージを受け取りました。\ntext: {message}"
 
+    # ログ出力
+    if "ログ" in message:
+        numbers = re.findall(r'[0-9]+', message)
+        if len(numbers) == 0:
+            reply = "直近何日間のログを出力しますか？"
+        elif len(numbers) == 1:
+            days = int(numbers[0])
+            reply = f"直近{days}日間のログを出力します。\n"
+            for l in push_recent_log(days):
+                reply += f"{l}\n"
+        else:
+            reply = "正常なログ出力に失敗しました。"
+
     # ログ出力設定
     if message.startswith("ログ") and "設定" in message:
         with open("dict_data/tweet_data/logs.json") as j:
@@ -86,18 +99,6 @@ def create_text(message):
         with open("dict_data/tweet_data/logs.json", 'w') as j:
             json.dump(log_conf, j)
 
-    # ログ出力
-    if "ログ" in message:
-        numbers = re.findall(r'[0-9]+', message)
-        if len(numbers) == 0:
-            reply = "直近何日間のログを出力しますか？"
-        elif len(numbers) == 1:
-            days = int(numbers[0])
-            reply = f"直近{days}日間のログを出力します。\n"
-            for l in push_recent_log(days):
-                reply += f"{l}\n"
-        else:
-            reply = "正常なログ出力に失敗しました。"
     return reply
 
 

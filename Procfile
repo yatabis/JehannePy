@@ -1,1 +1,1 @@
-web: python3 jehanne.py
+web: python3 Jehanne.py

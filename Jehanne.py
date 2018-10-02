@@ -66,17 +66,19 @@ def create_text(message):
 
     # ログ出力設定
     if message.startswith("ログ") and "設定" in message:
-        with open("dict_data/logs.json") as j:
+        with open("dict_data/tweet_data/logs.json") as j:
             log_conf = json.load(j)
         if "hourly" in message or "毎時" in message:
-            log_conf['hourly'] = 'オフ' not in message
+            log_conf['output']['hourly'] = 'オフ' not in message
             reply = f"ログ出力設定 [hourly] を{log_conf['hourly']}にしました。"
         if "daily" in message or "デイリー" in message or "毎時" in message:
-            log_conf['daily'] = 'オフ' not in message
+            log_conf['output']['daily'] = 'オフ' not in message
             reply = f"ログ出力設定 [hourly] を{log_conf['daily']}にしました。"
         if "monthly" in message or "マンスリー" in message or "毎月" in message:
-            log_conf['monthly'] = 'オフ' not in message
+            log_conf['output']['monthly'] = 'オフ' not in message
             reply = f"ログ出力設定 [hourly] を{log_conf['monthly']}にしました。"
+        with open("dict_data/tweet_data/logs.json", 'w') as j:
+            json.dump(log_conf, j)
 
     # ログ出力
     if "ログ" in message:

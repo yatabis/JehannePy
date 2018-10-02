@@ -64,16 +64,32 @@ def create_text(message):
     else:
         reply = f"メッセージを受け取りました。\ntext: {message}"
 
+    # ログ出力設定
+    if message.startswith("ログ") and "設定" in message:
+        with open("dict_data/logs.json") as j:
+            log_conf = json.load(j)
+        if "hourly" in message or "毎時" in message:
+            log_conf['hourly'] = 'オフ' not in message
+            reply = f"ログ出力設定 [hourly] を{log_conf['hourly']}にしました。"
+        if "daily" in message or "デイリー" in message or "毎時" in message:
+            log_conf['daily'] = 'オフ' not in message
+            reply = f"ログ出力設定 [hourly] を{log_conf['daily']}にしました。"
+        if "monthly" in message or "マンスリー" in message or "毎月" in message:
+            log_conf['monthly'] = 'オフ' not in message
+            reply = f"ログ出力設定 [hourly] を{log_conf['monthly']}にしました。"
+
     # ログ出力
-    if message.startswith("ログ"):
-        reply = "直近何日間のログを出力しますか？"
     if "ログ" in message:
         numbers = re.findall(r'[0-9]+', message)
-        if len(numbers) == 1:
+        if len(numbers) == 0:
+            reply = "直近何日間のログを出力しますか？"
+        elif len(numbers) == 1:
             days = int(numbers[0])
             reply = f"直近{days}日間のログを出力します。\n"
             for l in push_recent_log(days):
                 reply += f"{l}\n"
+        else:
+            reply = "正常なログ出力に失敗しました。"
     return reply
 
 

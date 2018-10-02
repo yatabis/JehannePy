@@ -14,9 +14,11 @@ AT = os.environ["ACCESS_TOKEN_J"]
 AS = os.environ["ACCESS_SECRET_J"]
 
 url_search = "https://api.twitter.com/1.1/search/tweets.json"
-url_DM = "https://api.twitter.com/1.1/direct_messages/new.json"
 
 now = datetime.now()
+year = now.year
+month = now.month
+day = now.day
 hour = now.hour
 minute = now.minute
 
@@ -27,13 +29,13 @@ file_path = f"dict_data/tweet_data/text/{file_name}"
 def scrape_twidata(auth, log):
 
     text = "lang:ja -rt -bot"
-    count = 100
-    loop = 15
+    count = 1#00
+    loop = 1#5
     max_id = None
     tweets = []
     check = 0
 
-    for _ in range(loop):
+    for i in range(loop):
         params = {"q": text, "count": count, "max_id": max_id}
         req = auth.get(url=url_search, params=params)
         status_code = []
@@ -109,11 +111,12 @@ def push_result(log):
 def push_logs(log):
     del log['recent'][-1]
     log['recent'].insert(0, log['today'])
+    noty = f"{year}年{month}月{day}日\n"
     if sum(log['today']) == 0:
-        noty = "本日のデータ収集は全て完了しました。"
+        noty += "本日のデータ収集は全て完了しました。"
     else:
         err = [i for i, t in enumerate(log['today']) if t == 1]
-        noty = "本日のデータ収集は一部失敗しました。\nエラーが発生した時刻は"
+        noty += "本日のデータ収集は一部失敗しました。\nエラーが発生した時刻は"
         for e in err:
             noty += f"、{e}時"
         noty += "です。"
@@ -130,6 +133,8 @@ if __name__ == '__main__':
     # Logs
     with open("dict_data/tweet_data/logs.json") as j:
         logs = json.load(j)
+    logs['scrape'] = {}
+    logs['upload'] = {}
 
     # Twitter
     twitter = OAuth1Session(CK, CS, AT, AS)
@@ -147,8 +152,11 @@ if __name__ == '__main__':
         logs['upload'] = False
 
     # result
-    push_result(logs)
-    if hour == 23:
+    if logs['output']['hourly']:
+        push_result(logs)
+    if logs['output']['daily'] and hour == 23:
         push_logs(logs['result'])
+    del logs['scrape']
+    del logs['upload']
     with open("dict_data/tweet_data/logs.json", 'w') as j:
         json.dump(logs, j)

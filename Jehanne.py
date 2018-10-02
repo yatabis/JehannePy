@@ -71,12 +71,18 @@ def create_text(message):
         if "hourly" in message or "毎時" in message:
             log_conf['output']['hourly'] = 'オフ' not in message
             reply = f"ログ出力設定 [hourly] を{log_conf['output']['hourly']}にしました。"
-        if "daily" in message or "デイリー" in message or "毎時" in message:
+        elif "daily" in message or "デイリー" in message or "毎時" in message:
             log_conf['output']['daily'] = 'オフ' not in message
             reply = f"ログ出力設定 [hourly] を{log_conf['output']['daily']}にしました。"
-        if "monthly" in message or "マンスリー" in message or "毎月" in message:
+        elif "monthly" in message or "マンスリー" in message or "毎月" in message:
             log_conf['output']['monthly'] = 'オフ' not in message
             reply = f"ログ出力設定 [hourly] を{log_conf['output']['monthly']}にしました。"
+        else:
+            reply = f"現在のログ出力設定は\n" \
+                    f"hourly: {log_conf['output']['hourly']}\n" \
+                    f"daily: {log_conf['output']['daily']}\n" \
+                    f"monthly: {log_conf['output']['monthly']}\n" \
+                    f"です。"
         with open("dict_data/tweet_data/logs.json", 'w') as j:
             json.dump(log_conf, j)
 

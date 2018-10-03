@@ -8,10 +8,10 @@ from pydrive.drive import GoogleDrive
 import httplib2
 from LINEbot import LineMessage
 
-CK = os.environ["CONSUMER_KEY_J"]
-CS = os.environ["CONSUMER_SECRET_J"]
-AT = os.environ["ACCESS_TOKEN_J"]
-AS = os.environ["ACCESS_SECRET_J"]
+CK = os.environ["TWI_CONSUMER_KEY"]
+CS = os.environ["TWI_CONSUMER_SECRET"]
+AT = os.environ["TWI_ACCESS_TOKEN"]
+AS = os.environ["TWI_ACCESS_SECRET"]
 
 url_search = "https://api.twitter.com/1.1/search/tweets.json"
 

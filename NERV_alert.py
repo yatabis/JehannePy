@@ -9,7 +9,7 @@ import LINEbot
 AT = os.environ['MSTDN_ACCESS_TOKEN']
 
 ENDPOINT = f'wss://mstdn.jp/api/v1/streaming/?stream=user&?access_token={AT}'
-NERV_ID = '59958'
+NERV_ID = '59194'#'59958'
 
 
 def on_open(ws):

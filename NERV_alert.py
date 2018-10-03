@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import ssl
 import bs4
 import requests
@@ -9,7 +10,7 @@ import LINEbot
 AT = os.environ['MSTDN_ACCESS_TOKEN']
 
 ENDPOINT = f'wss://mstdn.jp/api/v1/streaming/?stream=user&?access_token={AT}'
-NERV_ID = '59194'#'59958'
+NERV_ID = '59194'
 
 
 def on_open(ws):
@@ -25,7 +26,7 @@ def on_message(ws, message):
         if data['account']['id'] == NERV_ID:
             name = data['account']['display_name']
             status_url = data['url']
-            content = bs4.BeautifulSoup(data['content'], "html.parser")
+            content = bs4.BeautifulSoup(re.sub('<br>', "\n", data['content']), "html.parser")
             text = f"　{name}\n{content.p.getText()}"
             media_list = []
             for media in data['media_attachments']:
@@ -56,6 +57,7 @@ def on_close(ws):
     print(f"disconnected streaming server: {ws}")
 
 
+websocket.enableTrace(Truex)
 wss = websocket.WebSocketApp(ENDPOINT,
                              header={'Authorization': f'Bearer {AT}'},
                              on_open=on_open,

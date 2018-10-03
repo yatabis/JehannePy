@@ -20,11 +20,11 @@ class LineMessage:
 
     def __init__(self, event=None):
         """Constructor for LineMessage"""
-        self.room = event['source']['type'] if event is not None else None
-        self.sender = event['source']['userId'] if event is not None else None
-        self.type = event['message']['type'] if event is not None else None
-        self.token = event['replyToken'] if event is not None else None
-        self.message = self.get_message(event['message']) if event is not None else None
+        self.room = event['source']['type'] if event else None
+        self.sender = event['source']['userId'] if event else None
+        self.type = event['message']['type'] if event else None
+        self.token = event['replyToken'] if event else None
+        self.message = self.get_message(event['message']) if event else None
         self.body = []
 
     def get_message(self, message):
@@ -67,10 +67,12 @@ class LineMessage:
         header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {self.CAT}"}
         data = {'replyToken': self.token, 'messages': self.body}
         req = requests.post(self.url_reply, data=json.dumps(data), headers=header)
+        self.body = []
         return req
 
     def push_message(self):
         header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {self.CAT}"}
         data = {'to': self.MASTER, 'messages': self.body}
         req = requests.post(self.url_push, data=json.dumps(data), headers=header)
+        self.body = []
         return req

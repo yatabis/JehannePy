@@ -22,7 +22,7 @@ def on_message(ws, message):
         print(k, message[k])
     if message['event'] == 'update':
         data = json.loads(message['payload'])
-        if data['account']['id'] == '619088':# NERV_ID:
+        if data['account']['id'] == NERV_ID:
             name = data['account']['display_name']
             status_url = data['url']
             content = bs4.BeautifulSoup(data['content'], "html.parser")

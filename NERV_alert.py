@@ -57,7 +57,7 @@ def on_close(ws):
     print(f"disconnected streaming server: {ws}")
 
 
-websocket.enableTrace(Truex)
+websocket.enableTrace(True)
 wss = websocket.WebSocketApp(ENDPOINT,
                              header={'Authorization': f'Bearer {AT}'},
                              on_open=on_open,

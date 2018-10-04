@@ -19,5 +19,5 @@ if req.status_code == 200:
             bot.add_text("worker.1のstate変更に失敗しました。")
             bot.push_message()
 else:
-    bot.add_text("worker.1のstate取得に失敗しました。")
+    bot.add_text(f"worker.1のstate取得に失敗しました。\nstatus code: {req.status_code}")
     bot.push_message()

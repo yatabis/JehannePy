@@ -1,10 +1,13 @@
+import os
 import requests
 import LINEbot
 
 BASE_URL = "https://api.heroku.com/apps/jehanne/dynos"
 DYNO = "worker.1"
+API_KEY = os.environ['API_KEY']
 HEADER = {"Content-Type": "application/json",
-          "Accept": "application/vnd.heroku+json; version=3"}
+          "Accept": "application/vnd.heroku+json; version=3",
+          "Authorization": f"Bearer {API_KEY}"}
 
 bot = LINEbot.LineMessage()
 req = requests.get(f"{BASE_URL}/{DYNO}", headers=HEADER)

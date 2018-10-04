@@ -8,8 +8,8 @@ import websocket
 import LINEbot
 
 AT = os.environ['MSTDN_ACCESS_TOKEN']
-
-ENDPOINT = f'wss://mstdn.jp/api/v1/streaming/?stream=user&?access_token={AT}'
+PORT = os.environ.get('PORT', 443)
+ENDPOINT = f'wss://mstdn.jp:{PORT}/api/v1/streaming/?stream=user&?access_token={AT}'
 NERV_ID = '59194'
 
 

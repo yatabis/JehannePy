@@ -9,7 +9,7 @@ import LINEbot
 
 AT = os.environ['MSTDN_ACCESS_TOKEN']
 PORT = os.environ.get('PORT', 443)
-ENDPOINT = f'wss://mstdn.jp:{PORT}/api/v1/streaming/?stream=user&?access_token={AT}'
+ENDPOINT = f'wss://mstdn.jp/api/v1/streaming/?stream=user&?access_token={AT}'
 NERV_ID = '59194'
 
 
@@ -66,6 +66,6 @@ wss = websocket.WebSocketApp(ENDPOINT,
                              on_close=on_close)
 
 try:
-    wss.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    wss.run_forever(http_proxy_port=PORT, sslopt={"cert_reqs": ssl.CERT_NONE})
 except KeyboardInterrupt:
     wss.close()

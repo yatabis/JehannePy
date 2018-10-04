@@ -4,7 +4,7 @@ import LINEbot
 
 BASE_URL = "https://api.heroku.com/apps/jehanne/dynos"
 DYNO = "worker.1"
-API_KEY = "2d112f6f-6ec7-461f-aef9-5b8d791610fc"
+API_KEY = os.environ['API_KEY']
 HEADER = {"Content-Type": "application/json",
           "Accept": "application/vnd.heroku+json; version=3",
           "Authorization": f"Bearer {API_KEY}"}

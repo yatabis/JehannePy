@@ -9,7 +9,7 @@ import LINEbot
 
 AT = os.environ['MSTDN_ACCESS_TOKEN']
 PORT = os.environ.get('PORT', 443)
-ENDPOINT = f'wss://mstdn.jp/api/v1/streaming/?stream=user&?access_token={AT}'
+ENDPOINT = f'wss://mstdn.jp/api/v1/streaming/?stream=user'
 NERV_ID = '59194'
 
 
@@ -57,15 +57,14 @@ def on_close(ws):
     print(f"disconnected streaming server: {ws}")
 
 
-websocket.enableTrace(True)
-wss = websocket.WebSocketApp(ENDPOINT,
-                             header={'Authorization': f'Bearer {AT}'},
-                             on_open=on_open,
-                             on_message=on_message,
-                             on_error=on_error,
-                             on_close=on_close)
-
-try:
-    wss.run_forever(http_proxy_port=PORT, sslopt={"cert_reqs": ssl.CERT_NONE})
-except KeyboardInterrupt:
-    wss.close()
+if __name__ == '__main__':
+    wss = websocket.WebSocketApp(ENDPOINT,
+                                 header={'Authorization': f'Bearer {AT}'},
+                                 on_open=on_open,
+                                 on_message=on_message,
+                                 on_error=on_error,
+                                 on_close=on_close)
+    try:
+        wss.run_forever(http_proxy_port=PORT, sslopt={"cert_reqs": ssl.CERT_NONE})
+    except KeyboardInterrupt:
+        wss.close()

@@ -6,7 +6,7 @@ DYNO = "worker.1"
 HEADER = {"Content-Type": "application/json",
           "Accept": "application/vnd.heroku+json; version=3"}
 
-bot = LINEbot()
+bot = LINEbot.LineMessage()
 req = requests.get(f"{BASE_URL}/{DYNO}", headers=HEADER)
 if req.status_code == 200:
     state = req.json()['state']

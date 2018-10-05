@@ -59,10 +59,12 @@ class LineMessage:
         self.body.append({'type': 'sticker', 'packageId': pkg, 'stickerId': stk})
 
     def reply_message(self):
+        req = []
         header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {self.CAT}"}
-        data = {'replyToken': self.token, 'messages': self.body}
-        req = requests.post(self.url_reply, data=json.dumps(data), headers=header)
-        self.body = []
+        while self.body:
+            data = {'replyToken': self.token, 'messages': self.body[:5]}
+            req.append(requests.post(self.url_reply, data=json.dumps(data), headers=header))
+            self.body = self.body[5:]
         return req
 
     def push_message(self):

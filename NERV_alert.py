@@ -12,7 +12,6 @@ AT = os.environ['MSTDN_ACCESS_TOKEN']
 PORT = os.environ.get('PORT', 443)
 ENDPOINT = f'wss://mstdn.jp/api/v1/streaming/?stream=user'
 NERV_ID = '59194'
-OSAKA_ID = '59958'
 
 
 def on_open(ws):

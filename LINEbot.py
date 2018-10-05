@@ -66,10 +66,12 @@ class LineMessage:
         return req
 
     def push_message(self):
+        req = []
         header = {'Content-Type': 'application/json', 'Authorization': f"Bearer {self.CAT}"}
-        data = {'to': self.MASTER, 'messages': self.body[:5]}
-        req = requests.post(self.url_push, data=json.dumps(data), headers=header)
-        self.body = []
+        while self.body:
+            data = {'to': self.MASTER, 'messages': self.body[:5]}
+            req.append(requests.post(self.url_push, data=json.dumps(data), headers=header))
+            self.body = self.body[5:]
         return req
 
     def push_text(self, text):

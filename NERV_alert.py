@@ -6,15 +6,17 @@ import bs4
 import requests
 import websocket
 import LINEbot
+from Jehanne import JehanneAI
 
 AT = os.environ['MSTDN_ACCESS_TOKEN']
 PORT = os.environ.get('PORT', 443)
 ENDPOINT = f'wss://mstdn.jp/api/v1/streaming/?stream=user'
 NERV_ID = '59194'
+OSAKA_ID = '59958'
 
 
 def on_open(ws):
-    print(f"connected streaming server: {ws}")
+    print(f"connected streaming server: {ws.url}")
 
 
 def on_message(ws, message):
@@ -23,7 +25,7 @@ def on_message(ws, message):
         print(k, message[k])
     if message['event'] == 'update':
         data = json.loads(message['payload'])
-        if data['account']['id'] == NERV_ID:
+        if data['account']['id'] == NERV_ID and JehanneAI.alert_tags[0] in [t['name'] for t in data['tags']]:
             name = data['account']['display_name']
             status_url = data['url']
             content = bs4.BeautifulSoup(re.sub('<br>', "\n", data['content']), "html.parser")
@@ -54,7 +56,7 @@ def on_error(ws, error):
 
 
 def on_close(ws):
-    print(f"disconnected streaming server: {ws}")
+    print(f"disconnected streaming server: {ws.url}")
 
 
 if __name__ == '__main__':

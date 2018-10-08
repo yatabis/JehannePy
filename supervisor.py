@@ -11,18 +11,13 @@ HEADER = {"Content-Type": "application/json",
 
 bot = LINEbot.LineMessage()
 req = requests.get(f"{BASE_URL}/{DYNO}", headers=HEADER)
-print(f"headers:\n{req.headers}\nbody:\n{req.text}")
 if req.status_code == 200:
     state = req.json()['state']
     if not state == 'up':
-        bot.add_text(f"worker.1のstateが{state}になっていました。")
-        bot.push_message()
+        bot.push_text(f"【supervisor】\n{DYNO}のstateが{state}になっていました。")
 
         req = requests.delete(f"{BASE_URL}/{DYNO}", headers=HEADER)
-        print(f"headers:\n{req.headers}\nbody:\n{req.text}")
         if not req.status_code == 202:
-            bot.add_text(f"worker.1のstate変更に失敗しました。\nstatus code: {req.status_code}")
-            bot.push_message()
+            bot.push_text(f"【supervisor】\n{DYNO}のstate変更に失敗しました。\nstatus code: {req.status_code}")
 else:
-    bot.add_text(f"worker.1のstate取得に失敗しました。\nstatus code: {req.status_code}")
-    bot.push_message()
+    bot.push_text(f"【supervisor】\n{DYNO}のstate取得に失敗しました。\nstatus code: {req.status_code}")

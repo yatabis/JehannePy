@@ -6,7 +6,6 @@ import bs4
 import requests
 import websocket
 import LINEbot
-import Jehanne
 
 AT = os.environ['MSTDN_ACCESS_TOKEN']
 PORT = os.environ.get('PORT', 443)
@@ -24,7 +23,10 @@ def on_message(ws, message):
         print(k, message[k])
     if message['event'] == 'update':
         data = json.loads(message['payload'])
-        if data['account']['id'] == NERV_ID and Jehanne.JehanneAI.alert_tags[0] in [t['name'] for t in data['tags']]:
+        with open('Jehanne_states.json') as j:
+            Jehanne_states = json.load(j)
+            alert_tags = Jehanne_states['alert_tags']
+        if data['account']['id'] == NERV_ID and set(data['tags']).intersection(alert_tags):
             name = data['account']['display_name']
             status_url = data['url']
             content = bs4.BeautifulSoup(re.sub('<br>', "\n", data['content']), "html.parser")

@@ -5,11 +5,69 @@ import requests
 from bottle import route, run, request
 
 from LINEbot import LineMessage
+from JehanneTools import state_change
 
 
-CAT = os.environ["CHANNEL_ACCESS_TOKEN"]
-MASTER = os.environ["MASTER"]
-url_reply = "https://api.line.me/v2/bot/message/reply"
+class JehanneAI:
+    """
+    機能：
+    1. 名前に対する返事。(yes)
+    2. 定時報告の設定を確認・変更。(log_conf)
+    3. NERVアラートのタグの確認・変更。(alert_conf)
+
+    99. その他の簡単な受け答え。(chat)
+
+    :param MASTER: Jehanne's master, yatabis.
+    :param states_file: file path of Jehanne's states file.
+    :param alert_tags: Tags of NERV_alert.
+    """
+    MASTER = os.environ["MASTER"]
+    states_file = "Jehanne_states.json"
+    alert_tags = ['大阪府']
+
+    def __init__(self):
+        print("こんにちは、私の名前はジャンヌです。")
+
+    def callback(self, text):
+        """
+        メッセージを受け取った時のコールバック関数
+
+        :param text: received text.
+        :return:
+        """
+        kw = {
+               'log': [],
+               'alert': [],
+             }
+        for k in kw['log']:
+            if k in text:
+                self.log_conf(text)
+                break
+
+        return 0
+
+    @state_change
+    def log_conf(self, text):
+        kw = {
+            'twitter': [],
+            'mastodon': [],
+            'Wikipedia': [],
+            'hatena': [],
+            'note': [],
+        }
+
+    @state_change
+    def alert_conf(self, text):
+        pass
+
+    def chat(self, text):
+        """
+        その他の簡単な受け答えをする関数
+
+        :param text:
+        :return:
+        """
+        return text
 
 
 @route("/callback", method='POST')
@@ -20,27 +78,28 @@ def callback():
             break
         message = LineMessage(event)
         if not message.room == "user" or not message.sender == MASTER:
-            return f"Hi, this is Jehanne.\nauthorization failed."
+            return "こんにちは、私の名前はJehanneです。\n申し訳ありませんが、現在メッセージを受け取ることができません。"
         if message.type == "text":
-            text = create_text(message.message)
-            message.add_text(text)
+            jehanne.callback(message.message)
+            res = None
+            break
         elif message.type == "image":
-            message.add_text("画像を受け取りました。")
+            message.add_text("【テスト】画像を受け取りました。")
             message.add_text("受け取った画像はこちらです：")
             message.add_text("message.add_image")
         elif message.type == "video":
-            message.add_text("動画を受け取りました。")
+            message.add_text("【テスト】動画を受け取りました。")
             message.add_text("受け取った動画はこちらです：")
             message.add_text("message.add_video")
         elif message.type == "audio":
-            message.add_text("音声を受け取りました。")
+            message.add_text("【テスト】音声を受け取りました。")
             message.add_text("受け取った音声はこちらです：")
             message.add_text("message.add_audio")
         elif message.type == "file":
-            message.add_text("ファイルを受け取りました。")
+            message.add_text("【テスト】ファイルを受け取りました。")
             message.add_text(f"ファイル名は {message.message} です。")
         elif message.type == "sticker":
-            message.add_text("スタンプを受け取りました。")
+            message.add_text("【テスト】スタンプを受け取りました。")
             if int(message.message[0]) in range(1, 5):
                 message.add_text("受け取ったスタンプはこちらです：")
                 message.add_sticker(*message.message)
@@ -103,4 +162,5 @@ def create_text(message):
 
 
 if __name__ == '__main__':
+    jehanne = JehanneAI()
     run(host="0.0.0.0", port=int(os.environ.get("PORT", 443)))

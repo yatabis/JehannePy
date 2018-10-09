@@ -26,7 +26,7 @@ def on_message(ws, message):
         with open('Jehanne_states.json') as j:
             Jehanne_states = json.load(j)
             alert_tags = Jehanne_states['alert_tags']
-        if data['account']['id'] == NERV_ID and set(data['tags']).intersection(alert_tags):
+        if data['account']['id'] == NERV_ID and {t['name'] for t in data['tags']}.intersection(alert_tags):
             name = data['account']['display_name']
             status_url = data['url']
             content = bs4.BeautifulSoup(re.sub('<br>', "\n", data['content']), "html.parser")

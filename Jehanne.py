@@ -133,7 +133,7 @@ def callback_line():
         if not event['type'] == "message":
             break
         message = LineMessage(event)
-        if not message.room == "user" or not message.sender == MASTER:
+        if not message.room == "user" or not message.sender == JehanneAI.MASTER:
             return "こんにちは、私の名前はJehanneです。\n申し訳ありませんが、現在メッセージを受け取ることができません。"
         if message.type == "text":
             jehanne.callback(message.message)

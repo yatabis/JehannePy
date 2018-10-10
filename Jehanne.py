@@ -219,6 +219,7 @@ def create_text(message):
 
 if __name__ == '__main__':
     jehanne = JehanneAI()
+    print(f"al: {os.environ.get('APP_LOCATION')}")
     if os.environ.get('APP_LOCATION') == 'heroku':
         run(host="0.0.0.0", port=int(os.environ.get('PORT', 443)))
     else:

@@ -1,3 +1,4 @@
+from base64 import b64encode
 import json
 
 
@@ -17,3 +18,9 @@ def state_change(f):
             json.dump(vars(obj), j)
         return rtn
     return wrapper
+
+
+def basic_header(usr, pwd):
+    """make header of Basic Authorization."""
+    token = str(b64encode(f"{usr}:{pwd}".encode('utf-8')))[2:-1]
+    return {'Authorization': f"Basic {token}"}

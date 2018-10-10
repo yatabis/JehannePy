@@ -1,13 +1,15 @@
 import json
 import os
+import random
 import re
 import requests
-from bottle import route, run, request
+from bottle import route, run, request, response, auth_basic, abort
 
 from LINEbot import LineMessage
 from JehanneTools import state_change
 
 
+# Class Define
 class JehanneAI:
     """
     機能：
@@ -18,15 +20,27 @@ class JehanneAI:
     99. その他の簡単な受け答え。(chat)
 
     :param MASTER: Jehanne's master, yatabis.
+    :param CAS: Channel Access Token of LINE bot.
     :param states_file: file path of Jehanne's states file.
     :param alert_tags: Tags of NERV_alert.
     """
     MASTER = os.environ["MASTER"]
+    CAT = os.environ["CHANNEL_ACCESS_TOKEN"]
     states_file = "Jehanne_states.json"
-    alert_tags = ['大阪府']
 
     def __init__(self):
-        print("こんにちは、私の名前はジャンヌです。")
+        _states = self.load_states
+        self.log_twitter = _states['log_twitter']
+        self.log_mastodon = _states['log_mastodon']
+        self.log_wikipedia = _states['log_wikipedia']
+        self.log_note = _states['log_note']
+        self.log_hatena = _states['log_hatena']
+        self.alert_tags = _states['alert_tags']
+
+    def load_state(self):
+        with open(self.states_file) as j:
+            states = json.load(j)
+        return states
 
     def callback(self, text):
         """
@@ -45,6 +59,12 @@ class JehanneAI:
                 break
 
         return 0
+
+    def yes(self):
+        reply = [
+            "",
+        ]
+        random.choice(reply)
 
     @state_change
     def log_conf(self, text):
@@ -70,8 +90,25 @@ class JehanneAI:
         return text
 
 
-@route("/callback", method='POST')
-def callback():
+# Routing
+@route('/api/v1/<state>')
+@auth_basic(lambda x, y: x == JehanneAI.MASTER and y == JehanneAI.CAT)
+def get_state(state):
+    """API"""
+    print(request.auth)
+    if state in vars(jehanne):
+        response.headers['Content-Type'] = 'application/json'
+        return json.dumps(vars(jehanne)[state], ensure_ascii=False)
+    elif state == "states":
+        response.headers['Content-Type'] = 'application/json'
+        return json.dumps(list(vars(jehanne).keys()))
+    else:
+        abort(404)
+
+
+@route('/callback/line', method='POST')
+def callback_line():
+    """Line callback"""
     events = request.json['events']
     for event in events:
         if not event['type'] == "message":
@@ -163,4 +200,7 @@ def create_text(message):
 
 if __name__ == '__main__':
     jehanne = JehanneAI()
-    run(host="0.0.0.0", port=int(os.environ.get("PORT", 443)))
+    if os.environ.get('APP_LOCATION') == 'heroku':
+        run(host="0.0.0.0", port=int(os.environ.get('PORT', 443)))
+    else:
+        run(port=8080, reloader=True, debug=True)

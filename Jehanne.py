@@ -29,7 +29,7 @@ class JehanneAI:
     states_file = "Jehanne_states.json"
 
     def __init__(self):
-        _states = self.load_states
+        _states = self.load_states()
         self.log_twitter = _states['log_twitter']
         self.log_mastodon = _states['log_mastodon']
         self.log_wikipedia = _states['log_wikipedia']
@@ -91,7 +91,7 @@ class JehanneAI:
 
 
 # Routing
-@route('/api/v1/<state>')
+@route('/api/<state>')
 @auth_basic(lambda x, y: x == JehanneAI.MASTER and y == JehanneAI.CAT)
 def get_state(state):
     """API"""

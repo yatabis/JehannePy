@@ -14,6 +14,7 @@ class JehanneAI:
     """
     機能：
     1. 名前に対する返事。(yes)
+    2. 挨拶に対する返事。(greet)
     2. 定時報告の設定を確認・変更。(log_conf)
     3. NERVアラートのタグの確認・変更。(alert_conf)
 
@@ -50,21 +51,34 @@ class JehanneAI:
         :return:
         """
         kw = {
-               'log': [],
-               'alert': [],
-             }
-        for k in kw['log']:
-            if k in text:
-                self.log_conf(text)
-                break
+            'yes': ["Jehanne", "ジャンヌ", ],
+            'greet': ["おはよう", "おやすみ", ],
+            'log_conf': ["log", "ログ", ],
+            'alert_conf': ["NERV", "nerv", "alert", "アラート"],
+        }
+        for k in kw:
+            for l in kw[k]:
+                if l in text:
+                    eval(f"self.{k}")(text)
+                    break
 
-        return 0
-
-    def yes(self):
+    def yes(self, text):
         reply = [
-            "",
+            "およびですか、マスター。",
         ]
-        random.choice(reply)
+        self.push_line(random.choice(reply))
+
+    def greet(self, text):
+        morning = [
+            "はい、おはようございます、マスター。",
+        ]
+        night = [
+            "はい、おやすみなさい、マスター。"
+        ]
+        if "おはよう" in text:
+            self.push_line(random.choice(morning))
+        elif "おやすみ" in text:
+            self.push_line(random.choice(night))
 
     @state_change
     def log_conf(self, text):
@@ -88,6 +102,11 @@ class JehanneAI:
         :return:
         """
         return text
+
+    @staticmethod
+    def push_line(text):
+        bot = LineMessage()
+        bot.push_text(text)
 
 
 # Routing

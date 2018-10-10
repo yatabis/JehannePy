@@ -37,7 +37,7 @@ class JehanneAI:
         self.log_hatena = _states['log_hatena']
         self.alert_tags = _states['alert_tags']
 
-    def load_state(self):
+    def load_states(self):
         with open(self.states_file) as j:
             states = json.load(j)
         return states

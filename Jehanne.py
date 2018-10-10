@@ -137,7 +137,6 @@ def callback_line():
             return "こんにちは、私の名前はJehanneです。\n申し訳ありませんが、現在メッセージを受け取ることができません。"
         if message.type == "text":
             jehanne.callback(message.message)
-            res = None
             break
         elif message.type == "image":
             message.add_text("【テスト】画像を受け取りました。")
@@ -161,8 +160,8 @@ def callback_line():
                 message.add_sticker(*message.message)
             else:
                 message.add_text("こちらから送信できないスタンプです。")
-        res = message.reply_message()
-    return f"Hi, this is Jehanne.\nresponse: {res.content}"
+        message.reply_message()
+    return f"Hi, this is Jehanne.\n"
 
 
 def push_recent_log(days=0):

@@ -19,7 +19,6 @@ class LineMessage:
     url_push = "https://api.line.me/v2/bot/message/push"
 
     def __init__(self, event=None):
-        """Constructor for LineMessage"""
         self.room = event['source']['type'] if event else None
         self.sender = event['source']['userId'] if event else None
         self.type = event['message']['type'] if event else None
@@ -40,6 +39,8 @@ class LineMessage:
             return None
         elif self.type == "sticker":
             return message['packageId'], message['stickerId']
+        elif self.type == "postback":
+            return message['postback']
         else:
             return None
 

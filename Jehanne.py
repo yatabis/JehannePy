@@ -34,8 +34,6 @@ class JehanneAI:
         self.log_twitter = _states['log_twitter']
         self.log_mastodon = _states['log_mastodon']
         self.log_wikipedia = _states['log_wikipedia']
-        self.log_note = _states['log_note']
-        self.log_hatena = _states['log_hatena']
         self.alert_tags = _states['alert_tags']
 
     def load_states(self):
@@ -160,6 +158,9 @@ def callback_line():
                 message.add_sticker(*message.message)
             else:
                 message.add_text("こちらから送信できないスタンプです。")
+        elif message.type == "postback":
+            message.add_text("ポストバックを受け取りました。")
+            message.add_text(message.message)
         message.reply_message()
     return f"Hi, this is Jehanne.\n"
 

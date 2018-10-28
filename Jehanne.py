@@ -49,6 +49,7 @@ class JehanneAI:
         :return:
         """
         kw = {
+            'state_check': ["statesを見せて"],
             'yes': ["Jehanne", "ジャンヌ", ],
             'greet': ["おはよう", "おやすみ", ],
             'log_conf': ["log", "ログ", ],
@@ -59,6 +60,12 @@ class JehanneAI:
                 if l in text:
                     eval(f"self.{k}")(text)
                     break
+
+    def state_check(self):
+        reply = "私の現在のstatesです。\n"
+        for k, v in vars(self).items():
+            reply += f"{k}: {v}\n"
+        self.push_line(reply)
 
     def yes(self, text):
         reply = [

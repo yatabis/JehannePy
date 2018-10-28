@@ -162,6 +162,8 @@ def callback_line():
             message.add_text("ポストバックを受け取りました。")
             message.add_text(message.message)
         message.reply_message()
+        for k, v in vars(message).items():
+            print(f"{k}: {v}")
     return f"Hi, this is Jehanne.\n"
 
 

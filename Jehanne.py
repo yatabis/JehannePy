@@ -46,57 +46,57 @@ class JehanneAI:
             states = json.load(j)
         return states
 
-    def callback(self, text):
+    def callback(self, message):
         """
         メッセージを受け取った時のコールバック関数
 
-        :param text: received text.
+        :param message: received message object.
         :return:
         """
+
+        text = message.message
+
+        if "state" in text:
+            self.state = "state_check"
+        elif "アラートタグ" in text:
+            self.state = "alert_tags"
+
         if self.state == "top":
-            self.chat(text)
-        elif self.state == "alert_tag":
-            pass
-        else:
-            self.push_line(f"Jehanneのstateが壊れています。\nstate: {self.state}")
-
-    def state_check(self):
-        reply = "私の現在のstatesです。\n"
-        for k, v in vars(self).items():
-            reply += f"{k}: {v}\n"
-        self.push_line(reply)
-
-    def yes(self, text):
-        reply = [
-            "およびですか、マスター。",
-        ]
-        self.push_line(random.choice(reply))
-
-    def greet(self, text):
-        morning = [
-            "はい、おはようございます、マスター。",
-        ]
-        night = [
-            "はい、おやすみなさい、マスター。"
-        ]
-        if "おはよう" in text:
-            self.push_line(random.choice(morning))
-        elif "おやすみ" in text:
-            self.push_line(random.choice(night))
-
-    def chat(self, text):
-        """
-        その他の簡単な受け答えをする関数
-
-        :param text:
-        :return:
-        """
-        self.push_line(f"【テスト】以下のテキストを受け取りました。\n{text}")
-
-    @staticmethod
-    def push_line(text):
-        bot = LineMessage()
-        bot.push_text(text)
+            keyword = [
+                [["おはよう", ], ["はい、おはようございます。マスター。", "おはようございます。気分はどうですか？"]],
+                [["おやすみ", ], ["おやすみなさい、マスター。", "おやすみなさい。良い眠りを...💤"]],
+                [["ジャンヌ", "じゃんぬ", "Jehanne"], ["はい、何でしょうか、マスター。", "お呼びですか、マスター。"]]
+            ]
+            flag = 0
+            for kw in keyword:
+                for k in kw[0]:
+                    if k in text:
+                        message.push_text(random.choice(kw[1]))
+                        flag = 1
+                        break
+                if flag:
+                    break
+        elif self.state == "state_check":
+            reply = "現在のステータスはこちらです。\n"
+            for k, v in vars(self).items():
+                reply += f"{k}: {v}\n"
+            message.push_text(reply)
+            self.state = "top"
+        elif self.state == "alert_tags":
+            if "確認" in text:
+                reply = "現在のアラートタグはこちらです。\n"
+                for tag in self.alert_tags:
+                    reply += f"・{tag}\n"
+                message.push_text(reply)
+                self.state = "top"
+            elif "追加" in text:
+                message.push_text("追加するタグを送信してください。\n複数追加する場合は改行区切りでお願いします。")
+                self.state = "alert_tags_append"
+            else:
+                message.push_text("アラートタグを確認、または追加することができます。")
+        elif self.state == "alert_tags_append":
+            self.alert_tags.apppend(text.split())
+            self.state = "top"
 
 
 # Routing
@@ -126,7 +126,7 @@ def callback_line():
         if not message.room == "user" or not message.sender == JehanneAI.MASTER:
             return "こんにちは、私の名前はJehanneです。\n申し訳ありませんが、現在メッセージを受け取ることができません。"
         if message.type == "text":
-            jehanne.callback(message.message)
+            jehanne.callback(message)
         elif message.type == "image":
             message.add_text("【テスト】画像を受け取りました。")
             message.add_text("受け取った画像はこちらです：")
@@ -156,13 +156,6 @@ def callback_line():
         for k, v in vars(message).items():
             print(f"{k}: {v}")
     return f"Hi, this is Jehanne.\n"
-
-
-def push_recent_log(days=0):
-    with open("dict_data/tweet_data/logs.json") as j:
-        logs = json.load(j)
-    res = logs['result']['recent'][:days]
-    return res
 
 
 if __name__ == '__main__':

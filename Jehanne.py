@@ -95,8 +95,22 @@ class JehanneAI:
             else:
                 message.push_text("アラートタグを確認、または追加することができます。")
         elif self.state == "alert_tags_append":
-            self.alert_tags.apppend(text.split())
+            append_list = text.split()
+            self.alert_tags.append(append_list)
+            reply = f"以下のタグを追加しました。\n"
+            for al in append_list:
+                reply += f"・{al}\n"
+            message.add_text(reply)
+            reply = "現在のアラートタグはこちらです。\n"
+            for tag in self.alert_tags:
+                reply += f"・{tag}\n"
+            message.push_text(reply)
             self.state = "top"
+        self.state_update()
+
+    def state_update(self):
+        with open(JehanneAI.states_file, 'w') as j:
+            json.dump(vars(self), j)
 
 
 # Routing

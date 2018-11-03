@@ -1,5 +1,5 @@
 {
-  "state": "Top",
+  "state": "top",
   "log_twitter": {
     "hourly": false,
     "daily": true,

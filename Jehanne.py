@@ -52,10 +52,12 @@ class JehanneAI:
         :param text: received text.
         :return:
         """
-        if state == "alert_tag":
+        if self.state == "top":
+            self.chat(text)
+        elif self.state == "alert_tag":
             pass
         else:
-            self.chat(text)
+            self.push_line(f"Jehanneのstateが壊れています。\nstate: {self.state}")
 
     def state_check(self):
         reply = "私の現在のstatesです。\n"

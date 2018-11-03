@@ -1,4 +1,5 @@
 {
+  "state": "Top",
   "log_twitter": {
     "hourly": false,
     "daily": true,
@@ -10,16 +11,6 @@
     "monthly": false
   },
   "log_wikipedia": {
-    "daily": true,
-    "monthly": false
-  },
-  "log_note": {
-    "hourly": false,
-    "daily": true,
-    "monthly": false
-  },
-  "log_hatena": {
-    "hourly": false,
     "daily": true,
     "monthly": false
   },

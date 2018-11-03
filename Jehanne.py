@@ -28,13 +28,17 @@ class JehanneAI:
     MASTER = os.environ["MASTER"]
     CAT = os.environ["CHANNEL_ACCESS_TOKEN"]
     states_file = "Jehanne_states.json"
+    num = 0
 
     def __init__(self):
         _states = self.load_states()
+        self.idx = JehanneAI.num
+        self.state = _states['state']
         self.log_twitter = _states['log_twitter']
         self.log_mastodon = _states['log_mastodon']
         self.log_wikipedia = _states['log_wikipedia']
         self.alert_tags = _states['alert_tags']
+        JehanneAI.num += 1
 
     def load_states(self):
         with open(self.states_file) as j:
@@ -48,18 +52,10 @@ class JehanneAI:
         :param text: received text.
         :return:
         """
-        kw = {
-            'state_check': ["statesを見せて"],
-            'yes': ["Jehanne", "ジャンヌ", ],
-            'greet': ["おはよう", "おやすみ", ],
-            'log_conf': ["log", "ログ", ],
-            'alert_conf': ["NERV", "nerv", "alert", "アラート"],
-        }
-        for k in kw:
-            for l in kw[k]:
-                if l in text:
-                    eval(f"self.{k}")(text)
-                    break
+        if state == "alert_tag":
+            pass
+        else:
+            self.chat(text)
 
     def state_check(self):
         reply = "私の現在のstatesです。\n"
@@ -85,20 +81,6 @@ class JehanneAI:
         elif "おやすみ" in text:
             self.push_line(random.choice(night))
 
-    @state_change
-    def log_conf(self, text):
-        kw = {
-            'twitter': [],
-            'mastodon': [],
-            'Wikipedia': [],
-            'hatena': [],
-            'note': [],
-        }
-
-    @state_change
-    def alert_conf(self, text):
-        pass
-
     def chat(self, text):
         """
         その他の簡単な受け答えをする関数
@@ -106,7 +88,7 @@ class JehanneAI:
         :param text:
         :return:
         """
-        return text
+        self.push_line(f"【テスト】以下のテキストを受け取りました。\n{text}")
 
     @staticmethod
     def push_line(text):
@@ -181,52 +163,6 @@ def push_recent_log(days=0):
     return res
 
 
-def create_text(message):
-    # 名前に対する返事
-    if "ジャンヌ" in message:
-        reply = "およびですか、マスター。"
-    else:
-        reply = f"メッセージを受け取りました。\ntext: {message}"
-
-    # ログ出力
-    if "ログ" in message:
-        numbers = re.findall(r'[0-9]+', message)
-        if len(numbers) == 0:
-            reply = "直近何日間のログを出力しますか？"
-        elif len(numbers) == 1:
-            days = int(numbers[0])
-            reply = f"直近{days}日間のログを出力します。\n"
-            for l in push_recent_log(days):
-                reply += f"{l}\n"
-        else:
-            reply = "正常なログ出力に失敗しました。"
-
-    # ログ出力設定
-    if message.startswith("ログ") and "設定" in message:
-        with open("dict_data/tweet_data/logs.json") as j:
-            log_conf = json.load(j)
-        if "hourly" in message or "毎時" in message:
-            log_conf['output']['hourly'] = 'オフ' not in message
-            reply = f"ログ出力設定 [hourly] を{log_conf['output']['hourly']}にしました。"
-        elif "daily" in message or "デイリー" in message or "毎時" in message:
-            log_conf['output']['daily'] = 'オフ' not in message
-            reply = f"ログ出力設定 [daily] を{log_conf['output']['daily']}にしました。"
-        elif "monthly" in message or "マンスリー" in message or "毎月" in message:
-            log_conf['output']['monthly'] = 'オフ' not in message
-            reply = f"ログ出力設定 [monthly] を{log_conf['output']['monthly']}にしました。"
-        else:
-            reply = f"現在のログ出力設定は\n" \
-                    f"hourly: {log_conf['output']['hourly']}\n" \
-                    f"daily: {log_conf['output']['daily']}\n" \
-                    f"monthly: {log_conf['output']['monthly']}\n" \
-                    f"です。"
-        with open("dict_data/tweet_data/logs.json", 'w') as j:
-            json.dump(log_conf, j)
-
-    return reply
-
-
 if __name__ == '__main__':
     jehanne = JehanneAI()
     run(host="0.0.0.0", port=int(os.environ.get('PORT', 443)))
-    # run(port=8080, reloader=True, debug=True)

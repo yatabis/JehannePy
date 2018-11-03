@@ -1,4 +1,5 @@
 {
+  "debug": true,
   "state": "top",
   "log_twitter": {
     "hourly": false,

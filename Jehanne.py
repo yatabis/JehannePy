@@ -33,6 +33,7 @@ class JehanneAI:
     def __init__(self):
         _states = self.load_states()
         self.idx = JehanneAI.num
+        self.debug = _states['debug']
         self.state = _states['state']
         self.log_twitter = _states['log_twitter']
         self.log_mastodon = _states['log_mastodon']
@@ -126,7 +127,6 @@ def callback_line():
             return "こんにちは、私の名前はJehanneです。\n申し訳ありませんが、現在メッセージを受け取ることができません。"
         if message.type == "text":
             jehanne.callback(message.message)
-            break
         elif message.type == "image":
             message.add_text("【テスト】画像を受け取りました。")
             message.add_text("受け取った画像はこちらです：")

@@ -151,7 +151,8 @@ def callback_line():
             break
         message = LineMessage(event)
         if not message.room == "user" or not message.sender == JehanneAI.MASTER:
-            return "こんにちは、私の名前はJehanneです。\n申し訳ありませんが、現在メッセージを受け取ることができません。"
+            if not message.type == "postback":
+                return "こんにちは、私の名前はJehanneです。\n申し訳ありませんが、現在メッセージを受け取ることができません。"
         if message.type == "text":
             jehanne.callback(message)
         elif message.type == "image":

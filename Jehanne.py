@@ -156,7 +156,7 @@ def callback_line():
         if event['type'] == 'postback':
             # jehanne.callback(event['displayText'])
             message = LineMessage()
-            message.push_text(event)
+            message.push_text(json.dumps(event, ensure_ascii=False))
         if not event['type'] == "message":
             continue
         message = LineMessage(event)

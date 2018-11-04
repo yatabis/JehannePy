@@ -8,7 +8,6 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
 from LINEbot import LineMessage
-from JehanneTools import state_change
 
 
 # Class Define
@@ -143,21 +142,6 @@ class JehanneAI:
 
 
 # Routing
-@route('/api/<state>')
-@auth_basic(lambda x, y: x == JehanneAI.MASTER and y == JehanneAI.CAT)
-def get_state(state):
-    """API"""
-    print(request.auth)
-    if state in vars(jehanne):
-        response.headers['Content-Type'] = 'application/json'
-        return json.dumps(vars(jehanne)[state], ensure_ascii=False)
-    elif state == "states":
-        response.headers['Content-Type'] = 'application/json'
-        return json.dumps(list(vars(jehanne).keys()))
-    else:
-        abort(404)
-
-
 @route('/callback/line', method='POST')
 def callback_line():
     """Line callback"""
@@ -196,8 +180,9 @@ def callback_line():
             message.add_text("ポストバックを受け取りました。")
             message.add_text(message.message)
         message.reply_message()
-        for k, v in vars(message).items():
-            print(f"{k}: {v}")
+        if jehanne.debug:
+            for k, v in vars(message).items():
+                print(f"{k}: {v}")
     return f"Hi, this is Jehanne.\n"
 
 

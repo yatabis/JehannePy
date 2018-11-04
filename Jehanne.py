@@ -37,10 +37,10 @@ class JehanneAI:
         self._states = self.load_states()
         self.debug = self._states['debug']
         self.state = self._states['state']
-        self.log_twitter = _states['log_twitter']
-        self.log_mastodon = _states['log_mastodon']
-        self.log_wikipedia = _states['log_wikipedia']
-        self.alert_tags = _states['alert_tags']
+        self.log_twitter = self._states['log_twitter']
+        self.log_mastodon = self._states['log_mastodon']
+        self.log_wikipedia = self._states['log_wikipedia']
+        self.alert_tags = self._states['alert_tags']
         launcher = LineMessage()
         launcher.push_text("こんにちは、私の名前はジャンヌです。")
 

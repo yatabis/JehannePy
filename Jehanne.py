@@ -32,15 +32,17 @@ class JehanneAI:
     num = 0
 
     def __init__(self):
-        _states = self.load_states()
+        JehanneAI.num += 1
         self.idx = JehanneAI.num
-        self.debug = _states['debug']
-        self.state = _states['state']
+        self._states = self.load_states()
+        self.debug = self._states['debug']
+        self.state = self._states['state']
         self.log_twitter = _states['log_twitter']
         self.log_mastodon = _states['log_mastodon']
         self.log_wikipedia = _states['log_wikipedia']
         self.alert_tags = _states['alert_tags']
-        JehanneAI.num += 1
+        launcher = LineMessage()
+        launcher.push_text("こんにちは、私の名前はジャンヌです。")
 
     @staticmethod
     def load_states():
@@ -130,15 +132,19 @@ class JehanneAI:
         Google Driveのステータスファイルを現在のステータスに更新
         """
 
-        gauth = GoogleAuth()
-        gauth.CommandLineAuth()
-        drive = GoogleDrive(gauth)
-
-        file_list = drive.ListFile().GetList()
-        file_id = [fl for fl in file_list if fl['title'] == JehanneAI.states_file][0]['id']
-        file = drive.CreateFile({'id': file_id})
-        file.SetContentString(json.dumps(vars(self), ensure_ascii=False))
-        file.Upload()
+        states_old = self._states
+        states_now = vars(self)
+        del states_old['_states']
+        del states_now['_states']
+        if not states_old == states_now:
+            gauth = GoogleAuth()
+            gauth.CommandLineAuth()
+            drive = GoogleDrive(gauth)
+            file_list = drive.ListFile().GetList()
+            file_id = [fl for fl in file_list if fl['title'] == JehanneAI.states_file][0]['id']
+            file = drive.CreateFile({'id': file_id})
+            file.SetContentString(json.dumps(states_now, ensure_ascii=False))
+            file.Upload()
 
 
 # Routing
@@ -147,12 +153,13 @@ def callback_line():
     """Line callback"""
     events = request.json['events']
     for event in events:
+        if event['type'] == 'postback':
+            jehanne.callback(event['text'])
         if not event['type'] == "message":
-            break
+            continue
         message = LineMessage(event)
         if not message.room == "user" or not message.sender == JehanneAI.MASTER:
-            if not message.type == "postback":
-                return "こんにちは、私の名前はJehanneです。\n申し訳ありませんが、現在メッセージを受け取ることができません。"
+            return "こんにちは、私の名前はJehanneです。\n申し訳ありませんが、現在メッセージを受け取ることができません。"
         if message.type == "text":
             jehanne.callback(message)
         elif message.type == "image":
@@ -177,9 +184,6 @@ def callback_line():
                 message.add_sticker(*message.message)
             else:
                 message.add_text("こちらから送信できないスタンプです。")
-        elif message.type == "postback":
-            message.add_text("ポストバックを受け取りました。")
-            message.add_text(message.message)
         message.reply_message()
         if jehanne.debug:
             for k, v in vars(message).items():

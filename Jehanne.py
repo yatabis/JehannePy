@@ -4,6 +4,8 @@ import random
 import re
 import requests
 from bottle import route, run, request, response, auth_basic, abort
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 
 from LINEbot import LineMessage
 from JehanneTools import state_change
@@ -41,8 +43,24 @@ class JehanneAI:
         self.alert_tags = _states['alert_tags']
         JehanneAI.num += 1
 
-    def load_states(self):
-        with open(self.states_file) as j:
+    @staticmethod
+    def load_states():
+        """
+        Google Driveからステータスファイルをロードする。
+
+        :return: states
+            Jehanneのステータス（ステータスファイルの中身）
+        """
+        gauth = GoogleAuth()
+        gauth.CommandLineAuth()
+        drive = GoogleDrive(gauth)
+
+        file_list = drive.ListFile().GetList()
+        file_id = [fl for fl in file_list if fl['title'] == JehanneAI.states_file][0]['id']
+        file = drive.CreateFile({'id': file_id})
+        file.GetContentFile(JehanneAI.states_file)
+
+        with open(JehanneAI.states_file) as j:
             states = json.load(j)
         return states
 
@@ -50,8 +68,8 @@ class JehanneAI:
         """
         メッセージを受け取った時のコールバック関数
 
-        :param message: received message object.
-        :return:
+        :param: message
+            received message object.
         """
 
         text = message.message
@@ -96,7 +114,7 @@ class JehanneAI:
                 message.push_text("アラートタグを確認、または追加することができます。")
         elif self.state == "alert_tags_append":
             append_list = text.split()
-            self.alert_tags.append(append_list)
+            self.alert_tags += append_list
             reply = f"以下のタグを追加しました。\n"
             for al in append_list:
                 reply += f"・{al}\n"
@@ -109,8 +127,19 @@ class JehanneAI:
         self.state_update()
 
     def state_update(self):
-        with open(JehanneAI.states_file, 'w') as j:
-            json.dump(vars(self), j)
+        """
+        Google Driveのステータスファイルを現在のステータスに更新
+        """
+
+        gauth = GoogleAuth()
+        gauth.CommandLineAuth()
+        drive = GoogleDrive(gauth)
+
+        file_list = drive.ListFile().GetList()
+        file_id = [fl for fl in file_list if fl['title'] == JehanneAI.states_file][0]['id']
+        file = drive.CreateFile({'id': file_id})
+        file.SetContentString(json.dumps(vars(self), ensure_ascii=False))
+        file.Upload()
 
 
 # Routing

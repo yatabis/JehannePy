@@ -70,7 +70,7 @@ class JehanneAI:
             received message object.
         """
 
-        text = message.message
+        text = message.content
 
         if "state" in text:
             self.state = "state_check"

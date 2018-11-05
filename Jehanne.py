@@ -76,7 +76,7 @@ class JehanneAI:
             self.state = "state_check"
         elif "アラートタグ" in text:
             self.state = "alert_tags"
-        elif "リッチメニュー in text":
+        elif "リッチメニュー" in text:
             self.state = "rich_menu"
 
         if self.state == "top":

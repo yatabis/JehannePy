@@ -95,10 +95,11 @@ class JehanneAI:
                 if flag:
                     break
         elif self.state == "state_check":
-            reply = "現在のステータスはこちらです。\n"
-            for k, v in vars(self).items():
-                reply += f"{k}: {v}\n"
-            message.reply_text(reply)
+            message.add_text("現在のステータスはこちらです")
+            state = vars(self)
+            del state['_states']
+            message.add_text(pformat(state))
+            message.reply_message()
             self.state = "top"
         elif self.state == "alert_tags":
             if "確認" in text:

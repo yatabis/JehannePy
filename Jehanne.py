@@ -4,6 +4,7 @@ import random
 import re
 import requests
 from bottle import route, run, request, response, auth_basic, abort
+from pprint import pformat
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
@@ -12,8 +13,10 @@ from LINEbot import LineMessage
 
 # Class Define
 class JehanneAI:
+
     """
-    機能：
+    TODO
+    ----
     1. 名前に対する返事。(yes)
     2. 挨拶に対する返事。(greet)
     2. 定時報告の設定を確認・変更。(log_conf)
@@ -21,11 +24,25 @@ class JehanneAI:
 
     99. その他の簡単な受け答え。(chat)
 
-    :param MASTER: Jehanne's master, yatabis.
-    :param CAS: Channel Access Token of LINE bot.
-    :param states_file: file path of Jehanne's states file.
-    :param alert_tags: Tags of NERV_alert.
+    Parameters
+    ----------
+    MASTER : str
+        Jehanne's master, yatabis's LINE user ID.
+    CAT : str
+        Channel Access Token of LINE MessagingAPI.
+    states_file : str
+        file path of Jehanne's states file.
+
+    idx : int
+        serial number ob Jehanne instance.
+    debug : bool
+        whether debug mode or not.
+    state : str
+        Jehanne's internal state for determining callback process.
+    alert_tags : list of str
+        Tags of NERV_alert.
     """
+
     MASTER = os.environ["MASTER"]
     CAT = os.environ["CHANNEL_ACCESS_TOKEN"]
     states_file = "Jehanne_states.json"
@@ -34,42 +51,22 @@ class JehanneAI:
     def __init__(self):
         JehanneAI.num += 1
         self.idx = JehanneAI.num
-        self._states = self.load_states()
+        self._states = self.state_load()
         self.debug = self._states['debug']
         self.state = self._states['state']
-        self.log_twitter = self._states['log_twitter']
-        self.log_mastodon = self._states['log_mastodon']
-        self.log_wikipedia = self._states['log_wikipedia']
         self.alert_tags = self._states['alert_tags']
-        launcher = LineMessage()
-        launcher.push_text("こんにちは、私の名前はジャンヌです。")
-
-    @staticmethod
-    def load_states():
-        """
-        Google Driveからステータスファイルをロードする。
-
-        :return: states
-            Jehanneのステータス（ステータスファイルの中身）
-        """
-        gauth = GoogleAuth()
-        gauth.CommandLineAuth()
-        drive = GoogleDrive(gauth)
-
-        file_list = drive.ListFile().GetList()
-        file_id = [fl for fl in file_list if fl['title'] == JehanneAI.states_file][0]['id']
-        file = drive.CreateFile({'id': file_id})
-        file.GetContentFile(JehanneAI.states_file)
-
-        with open(JehanneAI.states_file) as j:
-            states = json.load(j)
-        return states
+        if self.idx == 1:
+            launcher = LineMessage()
+            launcher.push_text("こんにちは、私の名前はジャンヌです。")
 
     def callback(self, message):
-        """
-        メッセージを受け取った時のコールバック関数
 
-        :param: message
+        """
+        callback function receiving LINE message.
+
+        Parameters
+        ----------
+        message : LineMessage object
             received message object.
         """
 
@@ -79,6 +76,8 @@ class JehanneAI:
             self.state = "state_check"
         elif "アラートタグ" in text:
             self.state = "alert_tags"
+        elif "リッチメニュー in text":
+            self.state = "rich_menu"
 
         if self.state == "top":
             keyword = [
@@ -90,7 +89,7 @@ class JehanneAI:
             for kw in keyword:
                 for k in kw[0]:
                     if k in text:
-                        message.push_text(random.choice(kw[1]))
+                        message.reply_text(random.choice(kw[1]))
                         flag = 1
                         break
                 if flag:
@@ -99,17 +98,17 @@ class JehanneAI:
             reply = "現在のステータスはこちらです。\n"
             for k, v in vars(self).items():
                 reply += f"{k}: {v}\n"
-            message.push_text(reply)
+            message.reply_text(reply)
             self.state = "top"
         elif self.state == "alert_tags":
             if "確認" in text:
                 reply = "現在のアラートタグはこちらです。\n"
                 for tag in self.alert_tags:
                     reply += f"・{tag}\n"
-                message.push_text(reply)
+                message.reply_text(reply)
                 self.state = "top"
             elif "追加" in text:
-                message.push_text("追加するタグを送信してください。\n複数追加する場合は改行区切りでお願いします。")
+                message.reply_text("追加するタグを送信してください。\n複数追加する場合は改行区切りでお願いします。")
                 self.state = "alert_tags_append"
             else:
                 message.push_text("アラートタグを確認、または追加することができます。")
@@ -123,13 +122,79 @@ class JehanneAI:
             reply = "現在のアラートタグはこちらです。\n"
             for tag in self.alert_tags:
                 reply += f"・{tag}\n"
-            message.push_text(reply)
+            message.add_text(reply)
+            message.reply_message()
             self.state = "top"
+        elif self.state == "rich_menu":
+            if "リスト" in text:
+                res = self.line_request("GET", ep="https://api.line.me/v2/bot/richmenu/list")
+                if res:
+                    message.add_text("リッチメニューのリストです。")
+                    for r in res['richmenus']:
+                        message.add_text(pformat(r))
+                message.reply_message()
+            elif "デフォルト" in text:
+                res = self.line_request(GET, ep="https://api.line.me/v2/bot/user/all/richmenu")
+                if res:
+                    message.add_text("デフォルトリッチメニューです。")
+                    message.add_text(pformat(res))
+                message.reply_message()
+            elif text.startswith("richmenu-"):
+                res = self.line_request("GET", ep=f"https://api.line.me/v2/bot/richmenu/{text}")
+                if res:
+                    message.reply_text(pformat(res))
+            reply = "リッチメニューのリストを確認する場合は「リスト」を、\n" \
+                    "個別のリッチメニューを確認する場合はリッチメニューIDを送信してください。\n" \
+                    "また、デフォルトのリッチメニューを確認する場合は「デフォルト」を送信してください。"
+            message.reply_text(reply)
+            self.state = "top"
+
         self.state_update()
+
+    @staticmethod
+    def line_request(method="GET", ep="", q=None):
+        header = {'Authorization': f"Bearer {JehanneAI.CAT}"}
+        if method == "GET":
+            req = requests.get(ep, params=q, headers=header)
+        elif method == "POST":
+            req = requests.post(ep, data=q, headers=header)
+        else:
+            req = requests.Response()
+        if req.status_code == 200:
+            return req.json()
+        else:
+            error = LineMessage()
+            error.push_text(f"エラー　{req.status_code}\n{pformat(req.json())}")
+            return None
+
+    @staticmethod
+    def state_load():
+
+        """
+        load the states file from Google Drive.
+
+        Returns
+        -------
+        states : json object
+            Jehanne's states.
+        """
+
+        gauth = GoogleAuth()
+        gauth.CommandLineAuth()
+        drive = GoogleDrive(gauth)
+
+        file_list = drive.ListFile().GetList()
+        file_id = [fl for fl in file_list if fl['title'] == JehanneAI.states_file][0]['id']
+        file = drive.CreateFile({'id': file_id})
+        file.GetContentFile(JehanneAI.states_file)
+
+        with open(JehanneAI.states_file) as j:
+            states = json.load(j)
+        return states
 
     def state_update(self):
         """
-        Google Driveのステータスファイルを現在のステータスに更新
+        update the states file of Google Drive
         """
 
         states_old = self._states

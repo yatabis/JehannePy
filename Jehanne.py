@@ -133,21 +133,24 @@ class JehanneAI:
                     for r in res['richmenus']:
                         message.add_text(pformat(r))
                 message.reply_message()
+                self.state = "top"
             elif "デフォルト" in text:
                 res = self.line_request(GET, ep="https://api.line.me/v2/bot/user/all/richmenu")
                 if res:
                     message.add_text("デフォルトリッチメニューです。")
                     message.add_text(pformat(res))
                 message.reply_message()
+                self.state = "top"
             elif text.startswith("richmenu-"):
                 res = self.line_request("GET", ep=f"https://api.line.me/v2/bot/richmenu/{text}")
                 if res:
                     message.reply_text(pformat(res))
-            reply = "リッチメニューのリストを確認する場合は「リスト」を、\n" \
-                    "個別のリッチメニューを確認する場合はリッチメニューIDを送信してください。\n" \
-                    "また、デフォルトのリッチメニューを確認する場合は「デフォルト」を送信してください。"
-            message.reply_text(reply)
-            self.state = "top"
+                self.state = "top"
+            else:
+                reply = "リッチメニューのリストを確認する場合は「リスト」を、\n" \
+                        "個別のリッチメニューを確認する場合はリッチメニューIDを送信してください。\n" \
+                        "また、デフォルトのリッチメニューを確認する場合は「デフォルト」を送信してください。"
+                message.reply_text(reply)
 
         self.state_update()
 

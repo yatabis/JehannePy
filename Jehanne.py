@@ -97,7 +97,7 @@ class JehanneAI:
         elif self.state == "state_check":
             message.add_text("現在のステータスはこちらです")
             state = vars(self)
-            del state['_states']
+            # del state['_states']
             message.add_text(pformat(state))
             message.reply_message()
             self.state = "top"

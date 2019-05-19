@@ -3,7 +3,7 @@ import os
 import random
 import re
 import requests
-from bottle import route, run, request, response, auth_basic, abort
+from bottle import route, run, request, auth_basic, HTTPResponse
 from pprint import pformat
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -266,8 +266,6 @@ def callback_line():
 def notify():
     """LINE notification"""
     data = request.json
-    print(data)
-    print(type(data))
     title = data.get('title', None)
     message = data.get('message', None)
     body = ""
@@ -277,6 +275,12 @@ def notify():
         body += message
     line = LineMessage()
     line.push_text(body)
+    return HTTPResponse('OK')
+
+
+@route('/ping', method='GET')
+def ping():
+    return HTTPResponse('OK')
 
 
 if __name__ == '__main__':

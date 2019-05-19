@@ -262,6 +262,21 @@ def callback_line():
     return f"Hi, this is Jehanne.\n"
 
 
+@route('/notify', method='POST')
+def notify():
+    """LINE notification"""
+    data = request.json
+    title = data.get('title', None)
+    message = data.get('message', None)
+    body = ""
+    if title is not None:
+        body += f"【{title}】\n"
+    if message is not None:
+        body += message
+    line = LineMessage()
+    line.push_text(body)
+
+
 if __name__ == '__main__':
     jehanne = JehanneAI()
     run(host="0.0.0.0", port=int(os.environ.get('PORT', 443)))

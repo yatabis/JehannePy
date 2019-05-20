@@ -50,4 +50,4 @@ if __name__ == '__main__':
     for line in req.iter_lines():
         decoded = line.decode('utf-8')
         if decoded.startswith('data'):
-            alert(decoded[6:])
+            alert(json.loads(decoded[6:]))

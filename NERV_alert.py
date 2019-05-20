@@ -3,6 +3,7 @@ import os
 import re
 import ssl
 import bs4
+from pprint import pprint
 import requests
 import websocket
 import LINEbot
@@ -41,8 +42,7 @@ def alert(data):
         bot.push_message()
         bot.add_text(status_url)
         bot.push_message()
-    for k, v in data:
-        print(k, v)
+    pprint(data)
 
 
 if __name__ == '__main__':

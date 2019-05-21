@@ -5,9 +5,8 @@ import ssl
 import bs4
 from pprint import pprint
 import requests
-import websocket
 import LINEbot
-from Jehanne import JehanneAI
+# from Jehanne import JehanneAI
 
 AT = os.environ['MSTDN_ACCESS_TOKEN']
 HEADER = {'Authorization': f"Bearer {AT}"}
@@ -45,10 +44,22 @@ def alert(data):
     pprint(data)
 
 
+def error_check(data):
+    title = bs4.BeautifulSoup(data, "html.parser").title
+    if title and title.getText() == "mstdn.jp | 502: Bad gateway":
+        bot = LINEbot.LineMessage()
+        bot.push_text("ジャンヌです。現在mstdnのサーバーが停止しているため、速報をお届けできない状況です。")
+        return True
+    else:
+        return False
+
+
 if __name__ == '__main__':
     req = requests.get(EP, headers=HEADER, stream=True)
     for line in req.iter_lines():
         if line:
             decoded = line.decode('utf-8')
+            if error_check(decoded):
+                break
             if decoded.startswith('data'):
                 alert(json.loads(decoded[6:]))

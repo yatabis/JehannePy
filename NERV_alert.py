@@ -48,6 +48,7 @@ def alert(data):
 if __name__ == '__main__':
     req = requests.get(EP, headers=HEADER, stream=True)
     for line in req.iter_lines():
-        decoded = line.decode('utf-8')
-        if decoded.startswith('data'):
-            alert(json.loads(decoded[6:]))
+        if line:
+            decoded = line.decode('utf-8')
+            if decoded.startswith('data'):
+                alert(json.loads(decoded[6:]))

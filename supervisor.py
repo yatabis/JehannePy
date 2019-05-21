@@ -22,7 +22,7 @@ if req.status_code == 200:
             bot.push_text(f"【supervisor】\nJehanneへのpingの送信に失敗しました。\nstatus code: {req.status_code}")
     elif state == 'crashed':
         req = requests.delete(EP, headers=HEADER)
-        if not req.status_code == 200:
+        if not req.status_code == 202:
             bot.push_text(f"【supervisor】\nJehanneのstate変更に失敗しました。\nstatus code: {req.status_code}")
 else:
     bot.push_text(f"【supervisor】\nJehanneのstate取得に失敗しました。\nstatus code: {req.status_code}")

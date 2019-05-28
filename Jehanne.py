@@ -5,9 +5,8 @@ import re
 import requests
 from bottle import route, run, request, auth_basic, HTTPResponse
 from pprint import pformat
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
 
+from JehanneTools import *
 from LINEbot import LineMessage
 
 
@@ -45,16 +44,15 @@ class JehanneAI:
 
     MASTER = os.environ["MASTER"]
     CAT = os.environ["CHANNEL_ACCESS_TOKEN"]
-    states_file = "Jehanne_states.json"
     num = 0
 
     def __init__(self):
         JehanneAI.num += 1
         self.idx = JehanneAI.num
-        self._states = self.state_load()
-        self.debug = self._states['debug']
-        self.state = self._states['state']
-        self.alert_tags = self._states['alert_tags']
+        self.status = get_status('all')
+        # self.debug = self._states['debug']
+        self.state = self.status['state']
+        self.alert_tags = self.status['alert_tags']
         if self.idx == 1:
             launcher = LineMessage()
             launcher.push_text("こんにちは、私の名前はジャンヌです。")
@@ -171,50 +169,6 @@ class JehanneAI:
             error.push_text(f"エラー　{req.status_code}\n{pformat(req.json())}")
             return None
 
-    @staticmethod
-    def state_load():
-
-        """
-        load the states file from Google Drive.
-
-        Returns
-        -------
-        states : json object
-            Jehanne's states.
-        """
-
-        gauth = GoogleAuth()
-        gauth.CommandLineAuth()
-        drive = GoogleDrive(gauth)
-
-        file_list = drive.ListFile().GetList()
-        file_id = [fl for fl in file_list if fl['title'] == JehanneAI.states_file][0]['id']
-        file = drive.CreateFile({'id': file_id})
-        file.GetContentFile(JehanneAI.states_file)
-
-        with open(JehanneAI.states_file) as j:
-            states = json.load(j)
-        return states
-
-    def state_update(self):
-        """
-        update the states file of Google Drive
-        """
-
-        states_old = self._states
-        states_now = vars(self)
-        del states_old['_states']
-        del states_now['_states']
-        if not states_old == states_now:
-            gauth = GoogleAuth()
-            gauth.CommandLineAuth()
-            drive = GoogleDrive(gauth)
-            file_list = drive.ListFile().GetList()
-            file_id = [fl for fl in file_list if fl['title'] == JehanneAI.states_file][0]['id']
-            file = drive.CreateFile({'id': file_id})
-            file.SetContentString(json.dumps(states_now, ensure_ascii=False))
-            file.Upload()
-
 
 # Routing
 @route('/callback/line', method='POST')
@@ -263,11 +217,11 @@ def callback_line():
 
 
 @route('/notify', method='POST')
-def notify():
+def notify(title=None, message=None):
     """LINE notification"""
     data = request.json
-    title = data.get('title', None)
-    message = data.get('message', None)
+    title = data.get('title', title)
+    message = data.get('message', message)
     body = ""
     if title is not None:
         body += f"【{title}】\n"

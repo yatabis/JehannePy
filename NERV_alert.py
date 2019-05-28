@@ -1,12 +1,12 @@
 import json
 import os
 import re
-import ssl
 import bs4
 from pprint import pprint
+from pymongo import MongoClient
 import requests
 import LINEbot
-# from Jehanne import JehanneAI
+from JehanneTools import get_status
 
 AT = os.environ['MSTDN_ACCESS_TOKEN']
 HEADER = {'Authorization': f"Bearer {AT}"}
@@ -15,15 +15,12 @@ NERV_ID = '59194'
 
 
 def alert(data):
-    # with open('Jehanne_states.json') as j:
-    #     jehanne_states = json.load(j)
-    #     alert_tags = jehanne_states['alert_tags']
-    alert_tags = ['大阪府', '京都府', '和歌山県', '緊急']
+    alert_tags = get_status('alert_tags')
     if data['account']['id'] == NERV_ID and {t['name'] for t in data['tags']}.intersection(alert_tags):
         name = data['account']['display_name']
         status_url = data['url']
         content = bs4.BeautifulSoup(re.sub('<br>', "\n", data['content']), "html.parser")
-        text = f"　{name}\n{content.p.getText()}"
+        text = f"{name}\n{content.p.getText()}"
         media_list = []
         for media in data['media_attachments']:
             media_list.append({
@@ -38,7 +35,6 @@ def alert(data):
         for media in media_list:
             if media['type'] == 'image':
                 bot.add_image(media['url'], media['preview_url'])
-        bot.push_message()
         bot.add_text(status_url)
         bot.push_message()
     pprint(data)

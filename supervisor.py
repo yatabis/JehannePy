@@ -4,7 +4,7 @@ from JehanneTools import get_status, set_status
 from LINEbot import LineMessage
 
 BASE_URL = "https://api.heroku.com/apps/jehanne/dynos"
-DYNO = "worker.1"
+DYNO = "web.1"
 EP = f"{BASE_URL}/{DYNO}"
 API_KEY = os.environ['API_KEY']
 HEADER = {"Content-Type": "application/json",

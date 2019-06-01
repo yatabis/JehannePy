@@ -1,4 +1,5 @@
 import json
+import multiprocessing
 import os
 import random
 import re
@@ -8,6 +9,7 @@ from pprint import pformat
 
 from JehanneTools import *
 from LINEbot import LineMessage
+from NERV_alert import nerv_alert
 
 
 # Class Define
@@ -49,7 +51,7 @@ class JehanneAI:
     def __init__(self):
         JehanneAI.num += 1
         self.idx = JehanneAI.num
-        self.status = get_status('all')
+        self.status = get_status()
         # self.debug = self._states['debug']
         self.state = self.status['state']
         self.alert_tags = self.status['alert_tags']
@@ -237,6 +239,13 @@ def ping():
     return HTTPResponse('OK')
 
 
+def jehanne_start():
+    run(host="0.0.0.0", port=int(os.environ.get('PORT', 443)))
+
+
 if __name__ == '__main__':
     jehanne = JehanneAI()
-    run(host="0.0.0.0", port=int(os.environ.get('PORT', 443)))
+    process_Jehanne = multiprocessing.Process(target=jehanne_start)
+    process_NERV = multiprocessing.Process(target=nerv_alert)
+    process_Jehanne.start()
+    process_NERV.start()

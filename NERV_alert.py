@@ -50,7 +50,7 @@ def error_check(data):
         return False
 
 
-if __name__ == '__main__':
+def nerv_alert():
     req = requests.get(EP, headers=HEADER, stream=True)
     for line in req.iter_lines():
         if line:

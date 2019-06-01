@@ -5,7 +5,7 @@ from pymongo import MongoClient
 MONGODB_URI = os.environ.get('MONGODB_URI')
 
 
-def get_status(status=''):
+def get_status(status='all'):
     with MongoClient(MONGODB_URI) as client:
         jehanne_db = client[MONGODB_URI.split('/')[-1]]
         jehanne_status = jehanne_db['status'].find_one({'name': 'Jehanne'})

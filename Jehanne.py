@@ -10,6 +10,7 @@ from pprint import pformat
 from JehanneTools import *
 from LINEbot import LineMessage
 from NERV_alert import nerv_alert
+from weather_information import get_daily
 
 
 # Class Define
@@ -57,7 +58,7 @@ class JehanneAI:
         self.alert_tags = self.status['alert_tags']
         if self.idx == 1:
             launcher = LineMessage()
-            launcher.push_text("こんにちは、私の名前はジャンヌです。")
+            launcher.push_text("こんにちは、私の名前はJehanneです。")
 
     def callback(self, message):
 
@@ -216,6 +217,18 @@ def callback_line():
             for k, v in vars(message).items():
                 print(f"{k}: {v}")
     return f"Hi, this is Jehanne.\n"
+
+
+@route('/weather/call', method='GET')
+def weather_call():
+    line = LineMessage()
+    line.add_text(f"おはようございます。Jehanneです。\n{get_daily}")
+    line.push_message()
+
+
+@route('/weather/request', method='GET')
+def weather_request():
+    return "Weather request has not prepared yet."
 
 
 @route('/notify', method='POST')

@@ -220,10 +220,12 @@ def callback_line():
 
 
 @route('/weather/call', method='GET')
-def weather_call():
+def weather_call() -> HTTPResponse:
     line = LineMessage()
-    line.add_text(f"おはようございます。Jehanneです。\n{get_daily}")
+    daily_forecast = get_daily()
+    line.add_text(f"おはようございます。Jehanneです。\n{daily_forecast}")
     line.push_message()
+    return HTTPResponse()
 
 
 @route('/weather/request', method='GET')

@@ -1,11 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import requests
 
 LATITUDE = 34.74
 LONGTITUDE = 135.5
 SECRET_KEY = "a356b648b69971b0367f265836e5ef00"
-NOW = datetime.now().timestamp()
-DAILY_EP = (f"https://api.darksky.net/forecast/{SECRET_KEY}/{LATITUDE},{LONGTITUDE},{int(NOW)}"
+JST = timezone(timedelta(hours=+9), 'JST')
+NOW = int(datetime.now(JST).timestamp())
+DAILY_EP = (f"https://api.darksky.net/forecast/{SECRET_KEY}/{LATITUDE},{LONGTITUDE},{NOW}"
             f"?exclude=[currently,minutely,hourly,alerts]&lang=ja&units=si")
 
 

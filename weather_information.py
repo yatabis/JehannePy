@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, timezone
 import requests
 
-LATITUDE = 34.74
-LONGTITUDE = 135.5
-SECRET_KEY = "a356b648b69971b0367f265836e5ef00"
+LATITUDE = 34.745
+LONGTITUDE = 135.498
+SECRET_KEY = os.environ.get('DARKSKY_KEY')
 JST = timezone(timedelta(hours=+9), 'JST')
 NOW = int(datetime.now(JST).timestamp())
 DAILY_EP = (f"https://api.darksky.net/forecast/{SECRET_KEY}/{LATITUDE},{LONGTITUDE},{NOW}"

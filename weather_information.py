@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import os
 import requests
 
 LATITUDE = 34.745

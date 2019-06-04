@@ -6,10 +6,10 @@ LATITUDE = 34.745
 LONGTITUDE = 135.498
 SECRET_KEY = os.environ.get('DARKSKY_KEY')
 JST = timezone(timedelta(hours=+9), 'JST')
-NOW = int(datetime.now(JST).timestamp())
+NOW = datetime.now(JST)
 TODAY = int(datetime(NOW.year, NOW.month, NOW.day, 6).timestamp())
 TOMORROW = int(datetime(NOW.year, NOW.month, NOW.day + 1, 6).timestamp())
-DAILY_EP = (f"https://api.darksky.net/forecast/{SECRET_KEY}/{LATITUDE},{LONGTITUDE},{NOW}"
+DAILY_EP = (f"https://api.darksky.net/forecast/{SECRET_KEY}/{LATITUDE},{LONGTITUDE},{TODAY}"
             f"?exclude=[currently,minutely,hourly,alerts]&lang=ja&units=si")
 HOURLY_EP = [(f"https://api.darksky.net/forecast/{SECRET_KEY}/{LATITUDE},{LONGTITUDE},{ts}"
               f"?exclude=[currently,minutely,daily,alerts]&lang=ja&units=si") for ts in (TODAY, TOMORROW)]

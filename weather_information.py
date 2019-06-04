@@ -44,7 +44,7 @@ def forecast_chart(forecast: list) -> str:
     return text
 
 
-def hourly_forecast(response: dict) -> list:
+def hourly_forecast(response: dict, idx: int) -> list:
     error = response['flags'].get('darksky-unavailable', False)
     if error:
         on_error(error)
@@ -53,7 +53,7 @@ def hourly_forecast(response: dict) -> list:
         data = response['hourly']['data']
         for d in data:
             hour = datetime.fromtimestamp(d['time']).hour
-            if i == 0 and hour in (6, 9, 12, 15, 18, 21) or i == 1 and hour in (0, 3):
+            if idx == 0 and hour in (6, 9, 12, 15, 18, 21) or idx == 1 and hour in (0, 3):
                 ret.append(d)
         return ret
 
@@ -99,7 +99,7 @@ def get_hourly() -> str:
     for i in (0, 1):
         req = requests.get(HOURLY_EP[i])
         if req.status_code == 200:
-            res += hourly_forecast(req.json())
+            res += hourly_forecast(req.json(), i)
         else:
             return f"天気予報の取得に失敗しました。: {req.status_code}"
     return forecast_chart(res)

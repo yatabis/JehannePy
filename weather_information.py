@@ -7,8 +7,55 @@ LONGTITUDE = 135.498
 SECRET_KEY = os.environ.get('DARKSKY_KEY')
 JST = timezone(timedelta(hours=+9), 'JST')
 NOW = int(datetime.now(JST).timestamp())
+TODAY = int(datetime(NOW.year, NOW.month, NOW.day, 6).timestamp())
+TOMORROW = int(datetime(NOW.year, NOW.month, NOW.day + 1, 6).timestamp())
 DAILY_EP = (f"https://api.darksky.net/forecast/{SECRET_KEY}/{LATITUDE},{LONGTITUDE},{NOW}"
             f"?exclude=[currently,minutely,hourly,alerts]&lang=ja&units=si")
+HOURLY_EP = [(f"https://api.darksky.net/forecast/{SECRET_KEY}/{LATITUDE},{LONGTITUDE},{ts}"
+              f"?exclude=[currently,minutely,daily,alerts]&lang=ja&units=si") for ts in (TODAY, TOMORROW)]
+
+
+def forecast_chart(forecast: list) -> str:
+    degree = "ºC"
+    text = "3時間毎の予報です。\n"
+    for fc in forecast:
+        # pprint(fc)
+        time = datetime.fromtimestamp(fc['time']).strftime('%Y年%-m月%-d日%k時')
+        summary = fc['summary']
+        icon = fc['icon']
+        temp = fc['temperature']
+        temp_apparent = fc['apparentTemperature']
+        humidity = int(fc['humidity'] * 100)
+        precip_prob = int(fc['precipProbability'] * 100)
+        precip = fc['precipIntensity']
+        pressure = fc['pressure']
+        wind_speed = fc['windSpeed']
+        wind_bearing = fc['windBearing']
+        wind_direction = ['南', '南西', '西', '北西', '北', '北東', '東', '南東'][wind_bearing // 45]
+        uv_index = fc['uvIndex']
+        text += f"時刻：{time}|"
+        text += f"{summary} ({icon})|"
+        text += f"気温{temp}{degree} ({temp_apparent}{degree})|"
+        text += f"湿度{humidity}%|"
+        text += f"降水{precip_prob}% ({precip}mm/h)|"
+        text += f"気圧{pressure}hPa|"
+        text += f"{wind_direction}向きの風{wind_speed}m/s|"
+        text += f"UV指数{uv_index}\n"
+    return text
+
+
+def hourly_forecast(response: dict) -> list:
+    error = response['flags'].get('darksky-unavailable', False)
+    if error:
+        on_error(error)
+    else:
+        ret = []
+        data = response['hourly']['data']
+        for d in data:
+            hour = datetime.fromtimestamp(d['time']).hour
+            if i == 0 and hour in (6, 9, 12, 15, 18, 21) or i == 1 and hour in (0, 3):
+                ret.append(d)
+        return ret
 
 
 def daily_forecast(response: dict) -> str:
@@ -45,6 +92,17 @@ def daily_forecast(response: dict) -> str:
             forecast += f"{min_temp_apparent_time}頃に最低で{min_temp_apparent}{degree}となる予報です。\n"
         forecast += f"今日は{uv_index_time}頃にUV指数が{uv_index}となります。"
         return forecast
+
+
+def get_hourly() -> str:
+    res = []
+    for i in (0, 1):
+        req = requests.get(HOURLY_EP[i])
+        if req.status_code == 200:
+            res += hourly_forecast(req.json())
+        else:
+            return f"天気予報の取得に失敗しました。: {req.status_code}"
+    return forecast_chart(res)
 
 
 def get_daily() -> str:

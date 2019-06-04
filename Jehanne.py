@@ -7,10 +7,12 @@ import requests
 from bottle import route, run, request, auth_basic, HTTPResponse
 from pprint import pformat
 
+from typing import Optional
+
 from JehanneTools import *
 from LINEbot import LineMessage
 from NERV_alert import nerv_alert
-from weather_information import get_daily
+from weather_information import get_daily, get_hourly
 
 
 # Class Define
@@ -223,18 +225,20 @@ def callback_line():
 def weather_call() -> HTTPResponse:
     line = LineMessage()
     daily_forecast = get_daily()
+    hourly_forecast = get_hourly()
     line.add_text(f"おはようございます。Jehanneです。\n{daily_forecast}")
+    line.add_text(hourly_forecast)
     line.push_message()
     return HTTPResponse()
 
 
 @route('/weather/request', method='GET')
-def weather_request():
-    return "Weather request has not prepared yet."
+def weather_request() -> HTTPResponse:
+    return HTTPResponse("Weather request has not prepared yet.")
 
 
 @route('/notify', method='POST')
-def notify(title=None, message=None):
+def notify(title: Optional[str] = None, message: Optional[str] = None) -> HTTPResponse:
     """LINE notification"""
     data = request.json
     title = data.get('title', title)
@@ -251,7 +255,7 @@ def notify(title=None, message=None):
 
 @route('/ping', method='GET')
 def ping():
-    return HTTPResponse('OK')
+    return HTTPResponse('ping')
 
 
 def jehanne_start():

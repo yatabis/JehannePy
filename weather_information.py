@@ -20,7 +20,7 @@ def forecast_chart(forecast: list) -> str:
     text = "3時間毎の予報です。\n"
     for fc in forecast:
         # pprint(fc)
-        time = datetime.fromtimestamp(fc['time']).strftime('%Y年%-m月%-d日%k時')
+        time = datetime.fromtimestamp(fc['time'], JST).strftime('%Y年%-m月%-d日%k時')
         summary = fc['summary']
         icon = fc['icon']
         temp = fc['temperature']
@@ -33,14 +33,14 @@ def forecast_chart(forecast: list) -> str:
         wind_bearing = fc['windBearing']
         wind_direction = ['南', '南西', '西', '北西', '北', '北東', '東', '南東'][wind_bearing // 45]
         uv_index = fc['uvIndex']
-        text += f"時刻：{time}|"
-        text += f"{summary} ({icon})|"
-        text += f"気温{temp}{degree} ({temp_apparent}{degree})|"
-        text += f"湿度{humidity}%|"
-        text += f"降水{precip_prob}% ({precip}mm/h)|"
-        text += f"気圧{pressure}hPa|"
-        text += f"{wind_direction}向きの風{wind_speed}m/s|"
-        text += f"UV指数{uv_index}\n"
+        text += f"時刻：{time}\n"
+        text += f"{summary} ({icon})\n"
+        text += f"気温{temp}{degree} ({temp_apparent}{degree})\n"
+        text += f"湿度{humidity}%\n"
+        text += f"降水{precip_prob}% ({precip}mm/h)\n"
+        text += f"気圧{pressure}hPa\n"
+        text += f"{wind_direction}向きの風{wind_speed}m/s\n"
+        text += f"UV指数{uv_index}\n\n"
     return text
 
 
@@ -65,7 +65,7 @@ def daily_forecast(response: dict) -> str:
         return f"現在Dark Skyのデータを利用することができません。\nエラーメッセージ: {error}"
     else:
         data = response['daily']['data'][0]
-        date = datetime.fromtimestamp(data['time']).strftime('%Y年%-m月%-d日')
+        date = datetime.fromtimestamp(data['time'], JST).strftime('%Y年%-m月%-d日')
         summary = data['summary'][:-1]
         icon = data['icon']
         max_temp = data['temperatureMax']

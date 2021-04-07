@@ -1,5 +1,5 @@
 beautifulsoup4==4.6.0
-bottle==0.12.13
+bottle==0.12.19
 google-api-python-client==1.7.3
 google-auth==1.5.0
 google-auth-httplib2==0.0.3
